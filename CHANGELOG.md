@@ -1,6 +1,7 @@
 # Registro de cambios
 
 ## Presentación
+- Banner propio de cada juego, hecho con su arte (no una captura con panel).
 - README con banner, capturas de PC y móvil, GIFs, tabla de maravillas y detalles técnicos.
 - Icono propio de la página (una pirámide) en lugar del de RETROTERM.AI, más icono de 512 px y de pantalla de inicio.
 - Metaetiquetas para compartir el enlace.

@@ -51,63 +51,28 @@ function markExits(removeSet){
 }
 
 // ── Operarios ──
-// Figura articulada vista de lado, mirando a la derecha. Las articulaciones giran por CSS (css/nivel.css).
-const WORKER_LOOKS=[
-  {skin:'#d9a27a',skinD:'#b87f58',tunic:'#efe6cf',tunicD:'#c9bb98',band:'#b8442a',hair:'#2a1a10',belt:'#8a5a28'},
-  {skin:'#c58a62',skinD:'#a06a46',tunic:'#d9a85a',tunicD:'#a8782a',band:'#2a56a8',hair:'#1a100a',belt:'#5a3a18'},
-  {skin:'#e6b48c',skinD:'#c28e68',tunic:'#b8c8a0',tunicD:'#889870',band:'#8a2a2a',hair:'#5a3a22',belt:'#6a4620'},
-  {skin:'#b57a52',skinD:'#905a38',tunic:'#e8d4b4',tunicD:'#b89c78',band:'#e0b030',hair:'#140c08',belt:'#7a4a22'},
-];
-function workerRig(mat,v){
-  const k=WORKER_LOOKS[v%WORKER_LOOKS.length], m=MATERIALS[mat]||MATERIALS.piedra, id='wr'+v+mat;
-  return `<svg class="wrig" viewBox="0 0 70 104" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
-    <linearGradient id="${id}t" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${k.tunicD}"/><stop offset="0.45" stop-color="${k.tunic}"/><stop offset="1" stop-color="${k.tunicD}"/></linearGradient>
-    <linearGradient id="${id}s" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${k.skinD}"/><stop offset="0.5" stop-color="${k.skin}"/><stop offset="1" stop-color="${k.skinD}"/></linearGradient>
-    <linearGradient id="${id}b" x1="0" y1="0" x2="0.5" y2="1"><stop offset="0" stop-color="${m.c1}"/><stop offset="0.5" stop-color="${m.c2}"/><stop offset="1" stop-color="${m.c3}"/></linearGradient>
-  </defs>
-  <ellipse class="wsh" cx="35" cy="100" rx="17" ry="3.4" fill="#000" opacity="0.28"/>
-  <!-- pierna y brazo de atrás -->
-  <g class="w-thigh-b"><path d="M31 54L28 74L34 74L37 54Z" fill="url(#${id}s)" stroke="#3a2210" stroke-width="1" opacity="0.82"/>
-    <g class="w-shin-b"><path d="M28.4 73L28 92L33.4 92L34.2 73Z" fill="url(#${id}s)" stroke="#3a2210" stroke-width="1" opacity="0.82"/><path d="M26 91L35.5 91L38 96.5L24.5 96.5Z" fill="#6a4a28" stroke="#2a1608" stroke-width="1"/></g></g>
-  <g class="w-arm-b"><path d="M33 28L28 42L33 43L37 29Z" fill="url(#${id}s)" stroke="#3a2210" stroke-width="1" opacity="0.82"/>
-    <g class="w-fore-b"><path d="M28.4 41L27 55L32 56L33.4 42Z" fill="url(#${id}s)" stroke="#3a2210" stroke-width="1" opacity="0.82"/><ellipse cx="29.6" cy="57" rx="3" ry="3.2" fill="${k.skin}" stroke="#3a2210" stroke-width="1"/></g></g>
-  <!-- torso: túnica con cinturón -->
-  <path d="M25 27Q35 22 45 27L47 52L50 64L20 64L23 52Z" fill="url(#${id}t)" stroke="#4a3418" stroke-width="1.2" stroke-linejoin="round"/>
-  <path d="M23 52Q35 56 47 52L47.5 57Q35 61 22.5 57Z" fill="${k.belt}" stroke="#2a1608" stroke-width="1"/>
-  <path d="M28 33Q32 40 31 50M38 31Q41 40 40 50M26 58L25 64M33 59L33 64M41 58L42 64" fill="none" stroke="${k.tunicD}" stroke-width="1" opacity="0.8"/>
-  <path d="M25 27Q35 22 45 27" fill="none" stroke="#fff" stroke-width="1.4" opacity="0.35"/>
-  <!-- cuello y cabeza -->
-  <path d="M32 22L32 28L40 28L40 21Z" fill="url(#${id}s)" stroke="#3a2210" stroke-width="1"/>
-  <g class="w-head"><ellipse cx="37" cy="14" rx="9.5" ry="10.8" fill="url(#${id}s)" stroke="#3a2210" stroke-width="1.2"/>
-    <path d="M46 13Q50 15 46.4 18.4" fill="url(#${id}s)" stroke="#3a2210" stroke-width="1.1"/>
-    <path d="M27.8 11Q28 1.6 38 2.4Q47.2 3.4 46.6 11Q41 7.6 33.4 9Z" fill="${k.hair}" stroke="#1a0c04" stroke-width="1"/>
-    <path d="M27.6 10.4Q37 8 46.6 10.6L46.8 14Q37 11.6 27.8 14Z" fill="${k.band}" stroke="#2a1008" stroke-width="1"/>
-    <path d="M30 14Q33 21 38 21" fill="none" stroke="${k.skinD}" stroke-width="0.9" opacity="0.7"/>
-    <ellipse cx="42.6" cy="15" rx="1.3" ry="1.6" fill="#1a0c04"/><path d="M40.4 12.4Q43 11.4 45 12.6" fill="none" stroke="#2a1608" stroke-width="1"/>
-    <path d="M41 21Q43.5 21.6 45.4 20.6" fill="none" stroke="#6a2a1a" stroke-width="1" stroke-linecap="round"/>
-    <ellipse cx="31.4" cy="15.4" rx="1.9" ry="2.6" fill="${k.skinD}" stroke="#3a2210" stroke-width="0.8"/></g>
-  <!-- pierna y brazo de delante -->
-  <g class="w-thigh-f"><path d="M34 54L31 74L37.5 74L40 54Z" fill="url(#${id}s)" stroke="#3a2210" stroke-width="1"/>
-    <g class="w-shin-f"><path d="M31.4 73L31 92L36.6 92L37.4 73Z" fill="url(#${id}s)" stroke="#3a2210" stroke-width="1"/><path d="M29 91L38.5 91L41 96.5L27.5 96.5Z" fill="#7a5630" stroke="#2a1608" stroke-width="1"/><path d="M31 85H37M31 88H37" stroke="#4a3018" stroke-width="0.9"/></g></g>
-  <g class="w-arm-f"><path d="M38 28L36 42L41.5 43L44 29Z" fill="url(#${id}s)" stroke="#3a2210" stroke-width="1"/>
-    <g class="w-fore-f"><path d="M36.4 41L36.5 55L41.8 55.6L42 42Z" fill="url(#${id}s)" stroke="#3a2210" stroke-width="1"/><ellipse cx="39.4" cy="57.2" rx="3.2" ry="3.4" fill="${k.skin}" stroke="#3a2210" stroke-width="1"/></g></g>
-  <!-- bloque que lleva a la espalda -->
-  <g class="w-load"><rect x="14" y="22" width="26" height="22" rx="3" fill="url(#${id}b)" stroke="#2a1606" stroke-width="1.6"/><path d="M18 27H34" stroke="#fff" stroke-width="1.6" opacity="0.5" stroke-linecap="round"/><path d="M14 33H40M27 22V33" stroke="#2a1606" stroke-width="1" opacity="0.4"/></g>
-  </svg>`;
-}
+// Cuatro personajes (a, b, c, d) con hojas de animación en img/obreros (js/sprites.js tiene las medidas).
+// Caminar sin carga: <p>_walk. Con bloque en brazos: <p>_carry_<material>. Solo el personaje «a» tiene todos los materiales.
+const WORKER_KINDS=['a','b','c','d'];
+function carryKey(v,mat){ const k=WORKER_KINDS[v%WORKER_KINDS.length]; return SPRITES[`${k}_carry_${mat}`]?`${k}_carry_${mat}`:`${k}_carry_piedra`; }
+function pickWorker(mat,n){ return (mat==='piedra')?(n%WORKER_KINDS.length):0; }
+function sprSize(key,H){ const s=SPRITES[key]; return {w:Math.round(s.w*H/s.h),h:H}; }
+function sprHTML(key,H,dur){ const s=SPRITES[key], z=sprSize(key,H);
+  return `<div class="spr" style="width:${z.w}px;height:${H}px;background-image:url(img/obreros/${key}.png);background-size:${z.w*s.n}px ${H}px;--end:${-z.w*s.n}px;--dur:${dur||0.8}s"></div>`; }
+function preloadSprites(){ Object.keys(SPRITES).forEach(k=>{ const i=new Image(); i.src=`img/obreros/${k}.png`; }); }
 function fxLayer(){ let l=document.getElementById('fx-layer'); if(!l){ l=document.createElement('div'); l.id='fx-layer'; document.body.appendChild(l); } return l; }
 function laneRect(){ const l=document.querySelector('.g-lane'); return l?l.getBoundingClientRect():{left:0,right:innerWidth,top:innerHeight-62,bottom:innerHeight,width:innerWidth,height:62}; }
 function groundFeetY(){ const r=laneRect(); return r.top+r.height*0.80; }
 
-// Operarios descansando en el camino
+// Operarios en el camino: uno parado y otros tres que pasean despacio de un lado a otro
 function fillLane(){
   const l=document.querySelector('.g-lane'); if(!l) return;
   l.querySelectorAll('.idle').forEach(e=>e.remove());
-  const m=WONDERS[level].mat;
-  [18,52,84].forEach((p,i)=>{ const d=document.createElement('div'); d.className='idle'; d.style.left=p+'%'; d.style.animationDelay=(i*0.5)+'s'; d.innerHTML=workerRig(m,i+1); l.appendChild(d); });
+  const H=66, set=[['a_idle',16,0,1.9],['b_walk',34,1,1.0],['c_walk',58,2,1.1],['d_walk',82,3,0.95]];
+  set.forEach(([key,pos,i,dur])=>{ const d=document.createElement('div'); d.className='idle'+(key==='a_idle'?' still':' pacer'); d.style.left=pos+'%'; d.style.animationDelay=(-i*3.3)+'s'; d.innerHTML=sprHTML(key,H,dur); l.appendChild(d); });
 }
 
-const W_W=50, W_H=74, B_S=32;
+const W_H=92, B_S=32;
 function mkEl(cls,html,x,y,w,h){ const e=document.createElement('div'); e.className=cls; e.innerHTML=html; e.style.cssText=`left:${x}px;top:${y}px;width:${w}px;height:${h}px`; fxLayer().appendChild(e); return e; }
 function anim(el,frames,opts){ return new Promise(res=>{ const a=el.animate(frames,{fill:'forwards',...opts}); a.onfinish=()=>res(); }); }
 
@@ -117,42 +82,44 @@ async function deliverBlock(fromRect, mat, delayMs, variant){
   const stageIdx=Math.min(WONDERS[level].stages-1, deliveredIdx++);
   const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const feet=groundFeetY();
-  const bx=fromRect.left+fromRect.width/2-B_S/2;
+  const bx=fromRect.left+fromRect.width/2;            // centro del bloque
   const site=document.getElementById('site-scene');
   const sr=site?site.getBoundingClientRect():{left:60,width:300};
-  const dockX=sr.left+sr.width*0.5-W_W/2;
+  const dockC=sr.left+sr.width*0.5;                    // centro del solar
   if(delayMs) await new Promise(r=>setTimeout(r,delayMs));
   // 1) el bloque cae al suelo
-  const blk=mkEl('fall-block',rockSVG(mat,1),fromRect.left+fromRect.width/2-B_S/2,fromRect.top+fromRect.height/2-B_S/2,B_S,B_S);
-  const groundTop=feet-B_S+4;
+  const blk=mkEl('fall-block',rockSVG(mat,1),bx-B_S/2,fromRect.top+fromRect.height/2-B_S/2,B_S,B_S);
+  const groundTop=feet-B_S+4, dy=groundTop-(fromRect.top+fromRect.height/2-B_S/2);
   if(reduce){ blk.style.top=groundTop+'px'; }
-  else await anim(blk,[{transform:'translateY(0) rotate(0deg)'},{transform:`translateY(${groundTop-(fromRect.top+fromRect.height/2-B_S/2)}px) rotate(14deg)`,offset:.7},{transform:`translateY(${groundTop-(fromRect.top+fromRect.height/2-B_S/2)-8}px) rotate(8deg)`,offset:.85},{transform:`translateY(${groundTop-(fromRect.top+fromRect.height/2-B_S/2)}px) rotate(10deg)`}],{duration:520,easing:'cubic-bezier(.5,0,.9,.5)'});
-  spawnDust(bx+B_S/2,feet);
+  else await anim(blk,[{transform:'translateY(0) rotate(0deg)'},{transform:`translateY(${dy}px) rotate(14deg)`,offset:.7},{transform:`translateY(${dy-8}px) rotate(8deg)`,offset:.85},{transform:`translateY(${dy}px) rotate(10deg)`}],{duration:520,easing:'cubic-bezier(.5,0,.9,.5)'});
+  spawnDust(bx,feet);
   // 2) aparece un operario a un lado y anda hasta el bloque
-  const fromLeft=bx>innerWidth/2?false:true;
-  const startX=fromLeft? bx-170 : bx+170;
-  const w=mkEl('worker walking',workerRig(mat,variant),startX,feet-W_H,W_W,W_H);
+  const fromLeft=bx<=innerWidth/2;
+  const walk=sprSize(WORKER_KINDS[variant%4]+'_walk',W_H);
+  const startC=fromLeft? bx-190 : bx+190;
+  const w=mkEl('worker',sprHTML(WORKER_KINDS[variant%4]+'_walk',W_H,0.8),startC-walk.w/2,feet-W_H,walk.w,W_H);
   w.classList.toggle('face-left',!fromLeft);
-  if(reduce){ w.style.left=(bx-W_W/2+B_S/2)+'px'; }
+  const setC=c=>{ w.style.left=(c-parseFloat(w.style.width)/2)+'px'; };
+  if(reduce) setC(bx);
   else{
     w.style.opacity='0';
-    await anim(w,[{opacity:0,transform:'translateX(0)'},{opacity:1,transform:'translateX(0)',offset:.12},{opacity:1,transform:`translateX(${bx+B_S/2-W_W/2-startX}px)`}],{duration:Math.max(500,Math.abs(bx-startX)/0.2),easing:'linear'});
+    await anim(w,[{opacity:0,transform:'translateX(0)'},{opacity:1,transform:'translateX(0)',offset:.12},{opacity:1,transform:`translateX(${bx-startC}px)`}],{duration:Math.max(500,Math.abs(bx-startC)/0.2),easing:'linear'});
+    setC(bx); w.getAnimations().forEach(a=>a.cancel()); w.style.opacity='1';
   }
-  // 3) lo coge
-  w.classList.remove('walking'); w.classList.add('lifting');
-  if(!reduce) await new Promise(r=>setTimeout(r,520));
-  blk.remove(); w.classList.remove('lifting'); w.classList.add('loaded','walking','face-left');
-  const cx=parseFloat(getComputedStyle(w).left)+ (reduce?0:(bx+B_S/2-W_W/2-startX));
-  // 4) lo lleva a la maravilla (a la izquierda)
-  if(!reduce){
-    const here=bx+B_S/2-W_W/2;
-    await anim(w,[{transform:'translateX(0)'},{transform:`translateX(${dockX-here}px)`}],{duration:Math.max(700,Math.abs(dockX-here)/0.16),easing:'linear',composite:'replace'}).catch(()=>{});
-  }
-  w.classList.remove('walking');
-  placeStage(stageIdx); spawnDust(dockX+W_W/2,feet);
-  // 5) el operario se va
-  w.classList.remove('loaded'); w.classList.add('walking');
-  if(!reduce) await anim(w,[{opacity:1},{opacity:0}],{duration:600,delay:200});
+  // 3) se agacha, coge el bloque y se lo lleva en brazos hacia la maravilla
+  const carry=carryKey(variant,mat), cz=sprSize(carry,W_H);
+  if(!reduce){ w.classList.add('paused'); await anim(w,[{transform:'scaleY(1)'},{transform:'scaleY(.9)'},{transform:'scaleY(1)'}],{duration:420,easing:'ease-in-out'}); w.getAnimations().forEach(a=>a.cancel()); w.classList.remove('paused'); }
+  blk.remove();
+  const goLeft=dockC<bx;
+  w.innerHTML=sprHTML(carry,W_H,0.85); w.style.width=cz.w+'px'; w.classList.toggle('face-left',goLeft); setC(bx);
+  // 4) lo lleva a la maravilla
+  if(!reduce) await anim(w,[{transform:'translateX(0)'},{transform:`translateX(${dockC-bx}px)`}],{duration:Math.max(700,Math.abs(dockC-bx)/0.15),easing:'linear'});
+  w.style.left=(dockC-cz.w/2)+'px'; w.getAnimations().forEach(a=>a.cancel());
+  placeStage(stageIdx); spawnDust(dockC,feet);
+  // 5) deja el bloque y se va
+  const back=WORKER_KINDS[variant%4]+'_walk', bz=sprSize(back,W_H);
+  w.innerHTML=sprHTML(back,W_H,0.8); w.style.width=bz.w+'px'; setC(dockC); w.classList.toggle('face-left',!goLeft);
+  if(!reduce) await anim(w,[{opacity:1,transform:'translateX(0)'},{opacity:0,transform:`translateX(${goLeft?-60:60}px)`}],{duration:900,delay:150,easing:'linear'});
   w.remove(); pendingDeliveries--;
 }
 function spawnDust(x,y){
@@ -168,7 +135,7 @@ function collectExits(exits,rects){
     const rect=rects[i]||boardBottomRect(e.c);
     matsGot[e.tile.mat]=(matsGot[e.tile.mat]||0)+e.tile.blocks;
     rocksLeft--; wonderProg+=e.tile.blocks;
-    for(let k=0;k<e.tile.blocks;k++){ deliverBlock(rect,e.tile.mat,d,(e.c+k+deliveredIdx)%4); d+=520; }
+    for(let k=0;k<e.tile.blocks;k++){ deliverBlock(rect,e.tile.mat,d,pickWorker(e.tile.mat,e.c+k+deliveredIdx)); d+=520; }
     log(`${MATERIALS[e.tile.mat].name} +${e.tile.blocks}`,'gold');
   });
 }

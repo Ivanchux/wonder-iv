@@ -54,8 +54,6 @@
 .g-bottom { margin: 6px -16px 0; margin-top: auto; height: 76px; }
 .g-lane { position: absolute; inset: 0; background: linear-gradient(#d8b878, #b08c50); border-top: 4px solid #6a4a1c; overflow: hidden; }
 .lane-line { position: absolute; left: 0; right: 0; top: 50%; height: 3px; background: repeating-linear-gradient(90deg, #8a6a3a 0 18px, transparent 18px 34px); opacity: .55; }
-.g-lane .idle { position: absolute; bottom: 4px; width: 30px; height: 52px; animation: wbob .9s ease-in-out infinite alternate; }
-.g-lane .idle svg { width: 100%; height: 100%; }
 .g-log { position: absolute; left: 12px; bottom: 4px; max-width: 46vw; font-size: 11px; color: #3a2208; opacity: .85; pointer-events: none; display: flex; flex-direction: column; gap: 1px; }
 .g-log .log-line { background: rgba(255,246,214,.78); padding: 0 6px; border-radius: 6px; }
 .g-log .log-line::before { content: ''; }
@@ -63,43 +61,24 @@
 #fx-layer { position: fixed; inset: 0; pointer-events: none; z-index: 900; overflow: hidden; }
 .worker, .fall-block { position: absolute; will-change: transform, opacity; }
 .worker { filter: drop-shadow(0 2px 2px rgba(0,0,0,.35)); }
-.worker .wrig { width: 100%; height: 100%; display: block; overflow: visible; }
-.worker.face-left .wrig { transform: scaleX(-1); }
 .fall-block { filter: drop-shadow(0 3px 3px rgba(0,0,0,.55)); }
 .fall-block svg { width: 100%; height: 100%; display: block; }
 .dust { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: rgba(240,222,170,.85); animation: dust-up .65s ease-out forwards; }
 @keyframes dust-up { from { transform: translate(0,0) scale(.6); opacity: .9; } to { transform: translate(var(--dx), -22px) scale(1.7); opacity: 0; } }
 
-/* Ciclo de caminar: muslo, pantorrilla, brazo y antebrazo giran en sus articulaciones (unidades del viewBox 70×104) */
-.wrig [class^="w-"] { transform-box: view-box; }
-.w-thigh-f, .w-thigh-b { transform-origin: 35px 54px; }
-.w-shin-f, .w-shin-b { transform-origin: 34px 73px; }
-.w-arm-f, .w-arm-b { transform-origin: 38px 29px; }
-.w-fore-f, .w-fore-b { transform-origin: 39px 42px; }
-.w-load { display: none; }
-.worker.loaded .w-load { display: block; }
-.worker.walking .w-thigh-f { animation: th-f .62s ease-in-out infinite; }
-.worker.walking .w-thigh-b { animation: th-b .62s ease-in-out infinite; }
-.worker.walking .w-shin-f { animation: sh-f .62s ease-in-out infinite; }
-.worker.walking .w-shin-b { animation: sh-b .62s ease-in-out infinite; }
-.worker.walking .w-arm-f { animation: ar-f .62s ease-in-out infinite; }
-.worker.walking .w-arm-b { animation: ar-b .62s ease-in-out infinite; }
-.worker.walking .w-head { animation: hd .31s ease-in-out infinite alternate; }
-.worker.loaded.walking .w-arm-f, .worker.loaded.walking .w-arm-b { animation: none; transform: rotate(-150deg); }
-.worker.loaded.walking .w-fore-f, .worker.loaded.walking .w-fore-b { transform: rotate(-20deg); }
-@keyframes th-f { 0%,100% { transform: rotate(26deg); } 50% { transform: rotate(-26deg); } }
-@keyframes th-b { 0%,100% { transform: rotate(-26deg); } 50% { transform: rotate(26deg); } }
-@keyframes sh-f { 0%,100% { transform: rotate(-4deg); } 25% { transform: rotate(-30deg); } 50% { transform: rotate(-4deg); } 75% { transform: rotate(0deg); } }
-@keyframes sh-b { 0%,100% { transform: rotate(-4deg); } 25% { transform: rotate(0deg); } 50% { transform: rotate(-4deg); } 75% { transform: rotate(-30deg); } }
-@keyframes ar-f { 0%,100% { transform: rotate(-24deg); } 50% { transform: rotate(24deg); } }
-@keyframes ar-b { 0%,100% { transform: rotate(24deg); } 50% { transform: rotate(-24deg); } }
-@keyframes hd { from { transform: translateY(0); } to { transform: translateY(-1.4px); } }
-.worker.lifting .wrig { animation: lift .5s ease-in-out; transform-origin: 35px 100px; }
-@keyframes lift { 0% { transform: scale(1,1); } 40% { transform: scale(1.04,.84) translateY(4px); } 100% { transform: scale(1,1); } }
-.worker.lifting.face-left .wrig { animation: none; transform: scaleX(-1) scale(1.04,.86); }
-.g-lane .idle { position: absolute; bottom: 3px; width: 46px; height: 68px; animation: wbob 1.2s ease-in-out infinite alternate; }
-.g-lane .idle .wrig { width: 100%; height: 100%; overflow: visible; }
-@keyframes wbob { from { transform: translateY(0); } to { transform: translateY(-2px); } }
+/* Operarios: hojas de fotogramas (img/obreros), 8 pasos por ciclo */
+.spr { background-repeat: no-repeat; animation: spr var(--dur, .8s) steps(8) infinite; }
+@keyframes spr { to { background-position-x: var(--end); } }
+.worker.paused .spr { animation-play-state: paused; }
+.worker { transform-origin: 50% 100%; }
+.worker.face-left .spr, .idle.flip .spr { transform: scaleX(-1); }
+.g-lane .idle { position: absolute; bottom: 3px; }
+.g-lane .idle.pacer { animation: pace 15s linear infinite; }
+.g-lane .idle.still .spr { animation-duration: 1.9s; }
+@keyframes pace {
+  0% { transform: translateX(0) scaleX(1); } 49.9% { transform: translateX(110px) scaleX(1); }
+  50% { transform: translateX(110px) scaleX(-1); } 99.9% { transform: translateX(0) scaleX(-1); } 100% { transform: translateX(0) scaleX(1); }
+}
 
 /* ── Bloques dentro del tablero ── */
 .cell.rock { cursor: not-allowed; }
@@ -134,4 +113,4 @@
   .scroll-level { min-width: 0; flex: 1; }
   .g-hud-right { margin-left: 0; width: 100%; justify-content: flex-end; }
 }
-@media (prefers-reduced-motion: reduce) { .g-lane .idle, .worker *, .st.drop { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .g-lane .idle, .g-lane .idle .spr, .worker *, .st.drop { animation: none !important; } }

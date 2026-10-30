@@ -25,7 +25,7 @@ function startLevel(idx){
   inputBound=false;
   buildBoard();
   requestAnimationFrame(()=>{ relayoutBoard(); });
-  renderSite(); fillLane(); updateUI(); updateWonder(); updatePowerups();
+  preloadSprites(); renderSite(); fillLane(); updateUI(); updateWonder(); updatePowerups();
   log('Obra iniciada.','dim');
   log(`${w.name}: rompe las rocas para conseguir ${MATERIALS[w.mat].name}.`, 'info');
 }

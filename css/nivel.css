@@ -1,6 +1,6 @@
 /* WONDER IV — pantalla de nivel rediseñada: solar de la maravilla a un lado, tablero entre columnas y camino de operarios abajo. */
 
-#screen-game { flex-direction: column; align-items: stretch; padding: 46px 16px 0; gap: 10px; min-height: 100vh; }
+#screen-game { flex-direction: column; align-items: stretch; padding: 46px 16px 0; gap: 10px; height: 100vh; min-height: 560px; overflow: hidden; }
 #screen-game .g-hud, #screen-game .g-main, #screen-game .g-bottom { position: relative; z-index: 3; }
 
 /* ── Marcadores: rollos de pergamino ── */
@@ -17,28 +17,24 @@
 #screen-game .btn-back { color: #2a1604; border: 3px solid var(--borde); border-radius: 24px; background: var(--oro); }
 #screen-game .btn-back:hover { background: var(--oro); color: #14286a; }
 
-/* ── Composición ── */
-.g-main { --bs: min(560px, calc(100vh - 262px), 46vw); display: grid; grid-template-columns: minmax(280px, 1fr) auto 104px; gap: 18px 12px; align-items: end; justify-content: center; flex: 1; }
-.g-boardcol { position: relative; width: var(--bs); margin: 0 70px; }
+/* ── Composición: la maravilla al fondo, el tablero en el centro y los marcadores a la derecha ── */
+.g-main { --bs: min(560px, calc(100vh - 330px), 46vw); display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(150px, 1fr); gap: 0 14px; align-items: end; flex: 1; padding-bottom: 30px; }
+.g-boardcol { position: relative; width: var(--bs); margin: 0 72px; grid-column: 2; }
 .board-wrap { width: 100%; }
-.pillar { position: absolute; bottom: -4px; width: 86px; height: calc(var(--bs) + 96px); z-index: 0; filter: drop-shadow(0 6px 8px rgba(0,0,0,.45)); pointer-events: none; }
+.pillar { position: absolute; bottom: -4px; width: 86px; height: calc(var(--bs) + 96px); z-index: 0; filter: drop-shadow(0 6px 8px rgba(0,0,0,.45)); pointer-events: none; overflow: visible; }
 .pl { left: -78px; } .pr { right: -78px; }
-.pillar { overflow: visible; }
 .g-boardcol .board-wrap { position: relative; z-index: 1; }
+.g-side { grid-column: 3; justify-self: start; }
 
-/* ── Solar ── */
-.g-site { align-self: stretch; display: flex; flex-direction: column; min-height: 320px; background: linear-gradient(#a8d6f0, #dcebf0 62%, #f0e2bc); border: 4px solid var(--borde); border-radius: 16px; box-shadow: 0 10px 26px rgba(0,0,0,.45), inset 0 0 0 3px #f2d27a, inset 0 0 0 6px #14286a; overflow: hidden; position: relative; }
-.site-top { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px 0; font-family: var(--font-cin); font-size: 11px; letter-spacing: 3px; color: #14286a; font-weight: 700; z-index: 2; }
-.site-count { color: #3a2208; }
-.site-scene { flex: 1; display: flex; align-items: flex-end; justify-content: center; padding: 0 10px; min-height: 220px; }
-.wonder-svg { width: 100%; height: 100%; max-height: 100%; display: block; }
-.site-desc { padding: 6px 18px 12px; text-align: center; font-family: var(--font-cin); font-size: 12px; letter-spacing: 2px; color: #3a2208; background: linear-gradient(transparent, rgba(255,246,214,.7)); }
-.st.ghost * { fill: rgba(255,248,220,.08) !important; stroke: #6a5a3a !important; stroke-dasharray: 5 4; stroke-width: 1.1 !important; opacity: .6; }
+/* ── La maravilla de fondo ── */
+.site-scene { position: absolute; left: 1%; bottom: 74px; width: min(33vw, 520px); height: min(70vh, 560px); z-index: 1; pointer-events: none; display: flex; align-items: flex-end; }
+.wonder-svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 8px 10px rgba(60,40,10,.35)); }
+.st.ghost * { fill: rgba(255,248,220,.22) !important; stroke: #5a4a2a !important; stroke-dasharray: 5 4; stroke-width: 1.3 !important; opacity: .8; }
 .st.drop { animation: stage-drop .65s cubic-bezier(.2,.9,.3,1.25); }
 @keyframes stage-drop { 0% { transform: translateY(-46px); opacity: 0; } 60% { opacity: 1; } 100% { transform: translateY(0); } }
 
 /* ── Marcador de movimientos ── */
-.g-side { align-self: stretch; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 12px; padding-bottom: 6px; }
+.g-side { align-self: end; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 12px; padding-bottom: 6px; }
 .meter { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 74px; padding: 10px 0 8px; background: var(--oro); border: 3px solid var(--borde); border-radius: 38px; box-shadow: 0 4px 0 rgba(0,0,0,.4), inset 0 2px 0 rgba(255,255,255,.55); }
 .meter-lbl { font-family: var(--font-cin); font-size: 10px; letter-spacing: 2px; font-weight: 700; color: #3a2208; }
 .meter-tube { position: relative; width: 22px; height: calc(var(--bs) * .62); background: #1b1006; border: 3px solid var(--borde); border-radius: 12px; overflow: hidden; box-shadow: inset 0 0 8px #000; }
@@ -50,12 +46,12 @@
 .cb-lbl { font-family: var(--font-cin); font-size: 9px; letter-spacing: 2px; font-weight: 700; color: #4a2c78; }
 .cb-val { font-family: var(--font-cin); font-size: 22px; font-weight: 900; color: #3a1a78; }
 
-/* ── Poderes bajo el tablero ── */
-.g-boardcol .pu-list { display: flex; gap: 10px; justify-content: center; margin-top: 12px; position: relative; z-index: 2; }
-.g-boardcol .pu-btn { flex: 0 1 112px; padding: 5px 4px 4px; }
+/* ── Poderes en el lateral ── */
+.g-side .pu-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 150px; }
+.g-side .pu-btn { padding: 4px 2px 3px; }
 
 /* ── Camino de los operarios ── */
-.g-bottom { margin: 6px -16px 0; margin-top: auto; height: 62px; }
+.g-bottom { margin: 6px -16px 0; margin-top: auto; height: 76px; }
 .g-lane { position: absolute; inset: 0; background: linear-gradient(#d8b878, #b08c50); border-top: 4px solid #6a4a1c; overflow: hidden; }
 .lane-line { position: absolute; left: 0; right: 0; top: 50%; height: 3px; background: repeating-linear-gradient(90deg, #8a6a3a 0 18px, transparent 18px 34px); opacity: .55; }
 .g-lane .idle { position: absolute; bottom: 4px; width: 30px; height: 52px; animation: wbob .9s ease-in-out infinite alternate; }
@@ -65,19 +61,50 @@
 .g-log .log-line::before { content: ''; }
 
 #fx-layer { position: fixed; inset: 0; pointer-events: none; z-index: 900; overflow: hidden; }
-.carrier { position: absolute; will-change: transform; filter: drop-shadow(0 3px 3px rgba(0,0,0,.5)); }
-.carrier svg { width: 100%; height: 100%; display: block; }
-.carrier.walking svg { animation: wbob .26s ease-in-out infinite alternate; }
-@keyframes wbob { from { transform: translateY(0); } to { transform: translateY(-3px); } }
+.worker, .fall-block { position: absolute; will-change: transform, opacity; }
+.worker { filter: drop-shadow(0 2px 2px rgba(0,0,0,.35)); }
+.worker .wrig { width: 100%; height: 100%; display: block; overflow: visible; }
+.worker.face-left .wrig { transform: scaleX(-1); }
+.fall-block { filter: drop-shadow(0 3px 3px rgba(0,0,0,.55)); }
+.fall-block svg { width: 100%; height: 100%; display: block; }
 .dust { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: rgba(240,222,170,.85); animation: dust-up .65s ease-out forwards; }
 @keyframes dust-up { from { transform: translate(0,0) scale(.6); opacity: .9; } to { transform: translate(var(--dx), -22px) scale(1.7); opacity: 0; } }
 
-/* ── Rocas ── */
+/* Ciclo de caminar: muslo, pantorrilla, brazo y antebrazo giran en sus articulaciones (unidades del viewBox 70×104) */
+.wrig [class^="w-"] { transform-box: view-box; }
+.w-thigh-f, .w-thigh-b { transform-origin: 35px 54px; }
+.w-shin-f, .w-shin-b { transform-origin: 34px 73px; }
+.w-arm-f, .w-arm-b { transform-origin: 38px 29px; }
+.w-fore-f, .w-fore-b { transform-origin: 39px 42px; }
+.w-load { display: none; }
+.worker.loaded .w-load { display: block; }
+.worker.walking .w-thigh-f { animation: th-f .62s ease-in-out infinite; }
+.worker.walking .w-thigh-b { animation: th-b .62s ease-in-out infinite; }
+.worker.walking .w-shin-f { animation: sh-f .62s ease-in-out infinite; }
+.worker.walking .w-shin-b { animation: sh-b .62s ease-in-out infinite; }
+.worker.walking .w-arm-f { animation: ar-f .62s ease-in-out infinite; }
+.worker.walking .w-arm-b { animation: ar-b .62s ease-in-out infinite; }
+.worker.walking .w-head { animation: hd .31s ease-in-out infinite alternate; }
+.worker.loaded.walking .w-arm-f, .worker.loaded.walking .w-arm-b { animation: none; transform: rotate(-150deg); }
+.worker.loaded.walking .w-fore-f, .worker.loaded.walking .w-fore-b { transform: rotate(-20deg); }
+@keyframes th-f { 0%,100% { transform: rotate(26deg); } 50% { transform: rotate(-26deg); } }
+@keyframes th-b { 0%,100% { transform: rotate(-26deg); } 50% { transform: rotate(26deg); } }
+@keyframes sh-f { 0%,100% { transform: rotate(-4deg); } 25% { transform: rotate(-30deg); } 50% { transform: rotate(-4deg); } 75% { transform: rotate(0deg); } }
+@keyframes sh-b { 0%,100% { transform: rotate(-4deg); } 25% { transform: rotate(0deg); } 50% { transform: rotate(-4deg); } 75% { transform: rotate(-30deg); } }
+@keyframes ar-f { 0%,100% { transform: rotate(-24deg); } 50% { transform: rotate(24deg); } }
+@keyframes ar-b { 0%,100% { transform: rotate(24deg); } 50% { transform: rotate(-24deg); } }
+@keyframes hd { from { transform: translateY(0); } to { transform: translateY(-1.4px); } }
+.worker.lifting .wrig { animation: lift .5s ease-in-out; transform-origin: 35px 100px; }
+@keyframes lift { 0% { transform: scale(1,1); } 40% { transform: scale(1.04,.84) translateY(4px); } 100% { transform: scale(1,1); } }
+.worker.lifting.face-left .wrig { animation: none; transform: scaleX(-1) scale(1.04,.86); }
+.g-lane .idle { position: absolute; bottom: 3px; width: 46px; height: 68px; animation: wbob 1.2s ease-in-out infinite alternate; }
+.g-lane .idle .wrig { width: 100%; height: 100%; overflow: visible; }
+@keyframes wbob { from { transform: translateY(0); } to { transform: translateY(-2px); } }
+
+/* ── Bloques dentro del tablero ── */
 .cell.rock { cursor: not-allowed; }
 .cell.rock svg { filter: drop-shadow(0 3px 3px rgba(0,0,0,.75)); }
 .cell.rock:hover svg { transform: none; }
-.cell.rock-hit { animation: rock-hit .38s ease-out; }
-@keyframes rock-hit { 0% { transform: scale(1); } 25% { transform: scale(.88) rotate(-4deg); } 55% { transform: scale(1.06) rotate(3deg); } 100% { transform: scale(1); } }
 
 /* ── Pantalla final y menú con las escenas ── */
 .ov-scene { width: min(380px, 72vw); height: 250px; background: linear-gradient(#a8d6f0, #f0e2bc); border: 3px solid var(--borde); border-radius: 12px; overflow: hidden; }
@@ -88,12 +115,15 @@
 /* ── Móvil y tableta: se apila ── */
 @media (max-width: 899px) {
   #screen-game { padding: 46px 10px 0; }
-  .g-main { --bs: min(92vw, 520px); grid-template-columns: 1fr; justify-items: center; align-items: start; }
+  .g-main { --bs: min(92vw, 520px); grid-template-columns: minmax(0, 1fr); justify-items: center; align-items: start; }
+  .g-bottom { margin-left: -10px; margin-right: -10px; }
+  .g-hud { gap: 10px; }
+  .scroll { min-width: 0; padding: 6px 22px; }
+  .scroll-score { flex: 0 0 auto; }
   .g-boardcol { margin: 0 auto; }
   .pillar { display: none; }
-  .g-site { order: -1; width: 100%; min-height: 200px; max-height: 32vh; }
-  .site-scene { min-height: 120px; }
-  .site-desc { display: none; }
+  .site-scene { left: 0; right: 0; width: 100%; top: 96px; bottom: auto; height: 30vh; justify-content: center; }
+  .g-main { padding-top: 26vh; }
   .g-side { flex-direction: row; justify-content: center; align-items: center; width: 100%; padding: 0; }
   .meter { flex-direction: row; width: min(92vw, 520px); height: 44px; padding: 0 14px; border-radius: 30px; gap: 10px; }
   .meter-tube { flex: 1; width: auto; height: 16px; }
@@ -104,4 +134,4 @@
   .scroll-level { min-width: 0; flex: 1; }
   .g-hud-right { margin-left: 0; width: 100%; justify-content: flex-end; }
 }
-@media (prefers-reduced-motion: reduce) { .g-lane .idle, .carrier.walking svg, .st.drop, .cell.rock-hit { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .g-lane .idle, .worker *, .st.drop { animation: none !important; } }

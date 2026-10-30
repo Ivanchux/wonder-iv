@@ -81,7 +81,7 @@
   <!-- Marcadores como rollos de pergamino -->
   <div class="g-hud">
     <div class="scroll scroll-score"><span class="sc-lbl">PUNTOS</span><span class="sc-val sv-score" id="score">0</span></div>
-    <div class="scroll scroll-level"><span class="sc-lbl" id="badge-lvl">NIVEL 01</span><span class="sc-name" id="wonder-name">—</span></div>
+    <div class="scroll scroll-level"><span class="sc-lbl"><span id="badge-lvl">NIVEL 01</span> · <span id="prog-text">0 / 0</span> BLOQUES</span><span class="sc-name" id="wonder-name">—</span></div>
     <div class="g-hud-right">
       <button class="btn btn-small" id="btn-hint" onclick="doHint()" title="Sugerir un movimiento">◈ SUGERIR</button>
       <button class="btn btn-small" onclick="restartLevel()" title="Reiniciar">⟳</button>
@@ -89,15 +89,10 @@
     </div>
   </div>
 
-  <div class="g-main">
-    <!-- Solar: la maravilla se va levantando con lo que traen los operarios -->
-    <aside class="g-site" aria-label="Solar de la maravilla">
-      <div class="site-top"><span class="site-label">EN CONSTRUCCIÓN</span><span class="site-count"><span id="prog-text">0 / 0</span> BLOQUES</span></div>
-      <div id="site-scene" class="site-scene"></div>
-      <div class="site-desc" id="wonder-desc">—</div>
-    </aside>
+  <!-- La maravilla se ve al fondo, a la izquierda, y crece con cada bloque que llega -->
+  <div id="site-scene" class="site-scene" aria-label="Maravilla en construcción"></div>
 
-    <!-- Tablero entre dos columnas -->
+  <div class="g-main">
     <section class="g-boardcol">
       <svg class="pillar pl" viewBox="-40 -30 80 640" aria-hidden="true" focusable="false"><use href="#sc-column" x="0" y="0"/></svg>
       <div class="board-wrap" id="board-wrap">
@@ -105,15 +100,9 @@
         <div class="swipe-ghost" id="swipe-ghost"></div>
       </div>
       <svg class="pillar pr" viewBox="-40 -30 80 640" aria-hidden="true" focusable="false"><use href="#sc-column" x="0" y="0"/></svg>
-      <div class="pu-list" id="pu-list">
-      <button class="pu-btn" id="pu-bomb"    onclick="activatePowerup('bomb')"><span class="pu-count" id="pu-bomb-count">2</span><span class="pu-icon">💥</span><span class="pu-name">BOMBA</span></button>
-      <button class="pu-btn" id="pu-ray"     onclick="activatePowerup('ray')"><span class="pu-count" id="pu-ray-count">2</span><span class="pu-icon">⚡</span><span class="pu-name">RAYO</span></button>
-      <button class="pu-btn" id="pu-shuffle" onclick="activatePowerup('shuffle')"><span class="pu-count" id="pu-shuffle-count">1</span><span class="pu-icon">🔀</span><span class="pu-name">REVOLVER</span></button>
-      <button class="pu-btn" id="pu-color"   onclick="activatePowerup('color')"><span class="pu-count" id="pu-color-count">1</span><span class="pu-icon">✨</span><span class="pu-name">AURORA</span></button>
-    </div>
     </section>
 
-    <!-- Marcador vertical de movimientos -->
+    <!-- A la derecha: movimientos, combo y poderes -->
     <aside class="g-side">
       <div class="meter" id="stat-moves-box">
         <div class="meter-lbl">MOVS</div>
@@ -121,6 +110,12 @@
         <div class="meter-val sv-moves" id="moves">0</div>
       </div>
       <div class="combo-bubble" title="Combo"><span class="cb-lbl">COMBO</span><span class="cb-val sv-combo" id="combo">×1</span></div>
+      <div class="pu-list" id="pu-list">
+        <button class="pu-btn" id="pu-bomb"    onclick="activatePowerup('bomb')"><span class="pu-count" id="pu-bomb-count">2</span><span class="pu-icon">💥</span><span class="pu-name">BOMBA</span></button>
+        <button class="pu-btn" id="pu-ray"     onclick="activatePowerup('ray')"><span class="pu-count" id="pu-ray-count">2</span><span class="pu-icon">⚡</span><span class="pu-name">RAYO</span></button>
+        <button class="pu-btn" id="pu-shuffle" onclick="activatePowerup('shuffle')"><span class="pu-count" id="pu-shuffle-count">1</span><span class="pu-icon">🔀</span><span class="pu-name">REVOLVER</span></button>
+        <button class="pu-btn" id="pu-color"   onclick="activatePowerup('color')"><span class="pu-count" id="pu-color-count">1</span><span class="pu-icon">✨</span><span class="pu-name">AURORA</span></button>
+      </div>
     </aside>
   </div>
 

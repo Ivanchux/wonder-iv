@@ -62,11 +62,11 @@ function tileClass(tile){
   if(tile.kind==='gem-line') cls+=' gem-line';
   else if(tile.kind==='gem-area') cls+=' gem-area';
   else if(tile.kind==='rune') cls+=' rune';
-  else if(tile.kind==='rock') return `cell rock rock-${tile.mat} hp${tile.hp}`;
+  else if(tile.kind==='rock') return `cell rock rock-${tile.mat}`;
   return cls;
 }
 function tileHTML(tile){
-  if(tile.kind==='rock') return rockSVG(tile.mat,tile.hp,tile.max);
+  if(tile.kind==='rock') return rockSVG(tile.mat,tile.blocks);
   if(tile.kind==='gem-line') return gemLineSVG();
   if(tile.kind==='gem-area') return gemAreaSVG();
   if(tile.kind==='rune'){
@@ -266,7 +266,7 @@ async function activateGemSwap(r1,c1,r2,c2,tA,tB){
     }
   }
 
-  const brokenG=applyRockDamage(toDestroy);
+  for(const k of [...toDestroy]){ if(isRock(board[Math.floor(k/COLS)][k%COLS])) toDestroy.delete(k); }   // los bloques no se destruyen
   const cells=[...toDestroy].map(k=>({r:Math.floor(k/COLS),c:k%COLS}));
   const color=(tA?.kind==='gem-area'||tB?.kind==='gem-area')?'#ffaa0066':'#00e5ff55';
   spawnGemBurst(cells,color);
@@ -277,10 +277,10 @@ async function activateGemSwap(r1,c1,r2,c2,tA,tB){
   score+=pts; bumpStat('score');
   spawnScorePopup(r1,c1,pts,'#ffd060');
   updateUI();
-  collectBroken(brokenG);
 
   cells.forEach(({r,c})=>{ cellDom[r][c]?.remove(); cellDom[r][c]=null; board[r][c]=null; });
-  dropTiles(); fillBoard(); renderBoard();
+  const exG=dropTiles(); fillBoard(); renderBoard();
+  if(exG.length) collectExits(exG,[]);
   await wait(260);
   combo++; updateUI(); updateWonder();
   const chain=findMatches();
@@ -372,9 +372,11 @@ async function processMatches(matches){
     toRemove.delete(pivot.r*COLS+pivot.c);
   }
 
-  const broken=applyRockDamage(toRemove);
+  for(const k of [...toRemove]){ if(isRock(board[Math.floor(k/COLS)][k%COLS])) toRemove.delete(k); }   // los bloques solo salen cayendo
+  const exits=markExits(toRemove);
+  const exitKeys=new Set(exits.map(e=>e.r*COLS+e.c));
   const finalRemove=[...toRemove].map(k=>({r:Math.floor(k/COLS),c:k%COLS}));
-  finalRemove.forEach(({r,c})=>getCell(r,c)?.classList.add('popping'));
+  finalRemove.forEach(({r,c})=>{ if(!exitKeys.has(r*COLS+c)) getCell(r,c)?.classList.add('popping'); });
   if(gemCreated){
     const piv=getCell(gemCreated.r,gemCreated.c);
     if(piv){ piv.style.filter='brightness(3)'; setTimeout(()=>{piv.style.filter='';},350); }
@@ -414,8 +416,8 @@ async function processMatches(matches){
     log(`${tname} ×${sz} — +${pts}${bonusTxt}`,'ok');
   }
 
-  // ── Las rocas rotas dan material y los operarios lo llevan al solar ──
-  collectBroken(broken);
+  // ── Los bloques que salen del tablero caen al suelo y los operarios se los llevan ──
+  collectExits(exits, exits.map(e=>cellDom[e.r][e.c]?.getBoundingClientRect()));
 
   // ── Place new gem — after DOM removal so it gets a fresh element ──
   if(gemCreated){
@@ -515,11 +517,19 @@ async function processMatches(matches){
 //  BOARD HELPERS
 // ════════════════════════════════════════
 function dropTiles(){
+  const exits=[];
   for(let c=0;c<COLS;c++){
-    let empty=ROWS-1;
-    for(let r=ROWS-1;r>=0;r--){ if(board[r][c]){board[empty][c]=board[r][c]; if(empty!==r)board[r][c]=null; empty--;} }
-    for(let r=empty;r>=0;r--) board[r][c]=null;
+    for(let guard=0;guard<ROWS;guard++){
+      let empty=ROWS-1;
+      for(let r=ROWS-1;r>=0;r--){ if(board[r][c]){board[empty][c]=board[r][c]; if(empty!==r)board[r][c]=null; empty--;} }
+      for(let r=empty;r>=0;r--) board[r][c]=null;
+      // un bloque que llega a las dos filas de abajo sale del tablero
+      let out=false;
+      for(let r=ROWS-1;r>=ROCK_EXIT_ROW;r--){ const t=board[r][c]; if(isRock(t)){ exits.push({r,c,tile:t}); board[r][c]=null; out=true; } }
+      if(!out) break;
+    }
   }
+  return exits;
 }
 function fillBoard(){
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(!board[r][c]) board[r][c]=mkTile();
@@ -563,10 +573,21 @@ function shuffleBoard(){
 function doHint(){
   if(busy) return;
   clearHints();
+  // entre las jugadas posibles, la que despeja más celdas bajo un bloque
+  let best=null;
+  const probe=(r,c,r2,c2)=>{
+    if(!canSwapPair(r,c,r2,c2)) return;
+    swap(r,c,r2,c2); const m=findMatches(); swap(r,c,r2,c2);
+    if(!m.length) return;
+    let score=m.length*0.1;
+    for(const {r:mr,c:mc} of m){ for(let rr=0;rr<mr;rr++) if(isRock(board[rr][mc])){ score+=1; break; } }
+    if(!best||score>best.score) best={score,pair:[`${r},${c}`,`${r2},${c2}`]};
+  };
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
-    if(c<COLS-1&&canSwapPair(r,c,r,c+1)){swap(r,c,r,c+1);if(findMatches().length){swap(r,c,r,c+1);hintPair=[`${r},${c}`,`${r},${c+1}`];applyHints();log('Movimiento sugerido.','info');return;}swap(r,c,r,c+1);}
-    if(r<ROWS-1&&canSwapPair(r,c,r+1,c)){swap(r,c,r+1,c);if(findMatches().length){swap(r,c,r+1,c);hintPair=[`${r},${c}`,`${r+1},${c}`];applyHints();log('Movimiento sugerido.','info');return;}swap(r,c,r+1,c);}
+    if(c<COLS-1) probe(r,c,r,c+1);
+    if(r<ROWS-1) probe(r,c,r+1,c);
   }
+  if(best){ hintPair=best.pair; applyHints(); log('Movimiento sugerido.','info'); return; }
   log('No hay movimientos válidos.','err');
 }
 function applyHints(){ hintPair.forEach(k=>{const[r,c]=k.split(',');getCell(+r,+c)?.classList.add('hint-cell');}); }

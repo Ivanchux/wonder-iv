@@ -98,12 +98,12 @@ const MATERIALS = {
 // rocks = resistencia de cada roca (1 = se rompe con una combinación al lado, 2 = aguanta una más y da dos bloques).
 // Para añadir o equilibrar niveles, edita este array y las escenas de js/maravillas.js.
 const WONDERS = [
-  { id:'piramide', name:'GRAN PIRÁMIDE', place:'Guiza, Egipto', year:'c. 2560 A.C.', diff:'easy',   mat:'piedra',   movs:42, rocks:[1,1,1,1,1,1,1,1] },
-  { id:'jardines', name:'JARDINES COLGANTES', place:'Babilonia', year:'c. 600 A.C.',   diff:'easy',   mat:'ladrillo', movs:42, rocks:[1,1,1,1,1,1,1,1,1] },
-  { id:'zeus',     name:'ESTATUA DE ZEUS', place:'Olimpia, Grecia', year:'c. 435 A.C.', diff:'medium', mat:'marmol',   movs:40, rocks:[2,2,1,1,1,1,1,1] },
-  { id:'artemisa', name:'TEMPLO DE ARTEMISA', place:'Éfeso', year:'c. 550 A.C.',      diff:'medium', mat:'madera',   movs:40, rocks:[2,2,2,1,1,1,1,1] },
-  { id:'mausoleo', name:'MAUSOLEO DE HALICARNASO', place:'Halicarnaso', year:'c. 350 A.C.', diff:'hard', mat:'marmol', movs:38, rocks:[2,2,2,2,1,1,1,1] },
-  { id:'coloso',   name:'COLOSO DE RODAS', place:'Rodas', year:'c. 280 A.C.',          diff:'hard',   mat:'bronce',   movs:38, rocks:[2,2,2,2,2,1,1,1] },
-  { id:'faro',     name:'FARO DE ALEJANDRÍA', place:'Alejandría, Egipto', year:'c. 280 A.C.', diff:'expert', mat:'piedra', movs:36, rocks:[2,2,2,2,2,2,1,1] },
+  { id:'piramide', name:'GRAN PIRÁMIDE', place:'Guiza, Egipto', year:'c. 2560 A.C.', diff:'easy',   mat:'piedra',   movs:34, rocks:[1,1,1,1,1,1,1,1] },
+  { id:'jardines', name:'JARDINES COLGANTES', place:'Babilonia', year:'c. 600 A.C.',   diff:'easy',   mat:'ladrillo', movs:34, rocks:[1,1,1,1,1,1,1,1,1] },
+  { id:'zeus',     name:'ESTATUA DE ZEUS', place:'Olimpia, Grecia', year:'c. 435 A.C.', diff:'medium', mat:'marmol',   movs:32, rocks:[2,2,1,1,1,1,1,1] },
+  { id:'artemisa', name:'TEMPLO DE ARTEMISA', place:'Éfeso', year:'c. 550 A.C.',      diff:'medium', mat:'madera',   movs:32, rocks:[2,2,2,1,1,1,1,1] },
+  { id:'mausoleo', name:'MAUSOLEO DE HALICARNASO', place:'Halicarnaso', year:'c. 350 A.C.', diff:'hard', mat:'marmol', movs:30, rocks:[2,2,2,2,1,1,1,1] },
+  { id:'coloso',   name:'COLOSO DE RODAS', place:'Rodas', year:'c. 280 A.C.',          diff:'hard',   mat:'bronce',   movs:30, rocks:[2,2,2,2,2,1,1,1] },
+  { id:'faro',     name:'FARO DE ALEJANDRÍA', place:'Alejandría, Egipto', year:'c. 280 A.C.', diff:'expert', mat:'piedra', movs:30, rocks:[2,2,2,2,2,2,1,1] },
 ];
 WONDERS.forEach(w=>{ w.stages=w.rocks.reduce((a,b)=>a+b,0); w.desc=w.place+' — '+w.year; });

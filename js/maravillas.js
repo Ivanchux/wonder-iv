@@ -94,17 +94,17 @@ const SCENES={
 };
 
 // ── Renderizado ─────────────────────────────
-function wonderSceneSVG(id, built){
+function wonderSceneSVG(id, built, opts={}){
   const sc=SCENES[id]; if(!sc) return '';
   const st=sc.stages.map((g,i)=>`<g class="st ${i<built?'on':'ghost'}" data-s="${i}">${g}</g>`).join('');
-  return `<svg viewBox="0 -12 400 312" xmlns="http://www.w3.org/2000/svg" class="wonder-svg" role="img" aria-label="Maravilla en construcción" preserveAspectRatio="xMidYMax meet">${GROUND}${st}</svg>`;
+  return `<svg viewBox="0 -12 400 312" xmlns="http://www.w3.org/2000/svg" class="wonder-svg" role="img" aria-label="Maravilla en construcción" preserveAspectRatio="xMidYMax meet">${opts.ground===false?'':GROUND}${st}</svg>`;
 }
 // Estado de la construcción visible: cuántos bloques han llegado ya al solar
 let siteBuilt=0;
 function renderSite(){
   const w=WONDERS[level], box=document.getElementById('site-scene');
   if(!box) return;
-  box.innerHTML=wonderSceneSVG(w.id, siteBuilt);
+  box.innerHTML=wonderSceneSVG(w.id, siteBuilt, {ground:false});
 }
 function placeStage(k){
   siteBuilt=Math.max(siteBuilt,k+1);

@@ -41,7 +41,6 @@ function updateUI(){
 function updateWonder(){
   const w=WONDERS[level];
   document.getElementById('wonder-name').textContent=w.name;
-  document.getElementById('wonder-desc').textContent=w.desc;
   document.getElementById('prog-text').textContent=`${wonderProg} / ${w.stages}`;
 }
 

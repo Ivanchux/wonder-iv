@@ -1,10 +1,11 @@
 # Registro de cambios
 
 ## 1.2 · Fase 2: el nivel se rehace
-- **Rocas de material** (piedra, ladrillo, mármol, madera y bronce) en el tablero: no se mueven ni combinan, y se rompen con combinaciones de al lado o con explosiones. Algunas aguantan un golpe más y dan dos bloques.
-- **Operarios** que recogen lo que suelta cada roca y lo llevan andando hasta el solar, donde se coloca el siguiente bloque de la maravilla.
+- **Bloques de material dentro de la cuadrícula** (piedra, ladrillo, mármol, madera y bronce): no se mueven ni se combinan. Caen a medida que se despeja lo que tienen debajo y, al llegar a las dos filas de abajo, salen del tablero. Algunos valen dos bloques.
+- **Operarios** que aparecen en el camino, andan hasta donde cayó el bloque, lo levantan y lo llevan hasta la maravilla, que está de fondo y crece con cada bloque entregado. No hay pantalla aparte.
+- La pista sugiere la jugada que despeja más celdas bajo un bloque.
 - **Siete maravillas** clásicas (Gran Pirámide, Jardines Colgantes, Estatua de Zeus, Templo de Artemisa, Mausoleo de Halicarnaso, Coloso de Rodas y Faro de Alejandría), dibujadas en SVG por bloques en `js/maravillas.js`. Desaparecen las eras, los objetivos por tipo de pieza y el arte ASCII.
-- **Pantalla de nivel nueva:** solar a la izquierda, tablero entre dos columnas, marcador vertical de movimientos, marcadores de pergamino, poderes bajo el tablero y camino de operarios abajo. En el móvil se apila.
+- **Pantalla de nivel nueva:** maravilla de fondo a la izquierda, tablero entre dos columnas, marcador vertical de movimientos, marcadores de pergamino, poderes a la derecha y camino de operarios abajo. En el móvil se apila.
 - Los materiales recogidos se guardan en el navegador (`wonder_stock`) para el asentamiento.
 - Se corrige que una gema de línea o de área sola diera el tablero por «sin movimientos», y el «revolver» ya no deja combinaciones hechas.
 

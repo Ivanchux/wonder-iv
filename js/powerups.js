@@ -41,19 +41,18 @@ async function applyPowerupAt(r, c){
       const nr=r+dr, nc=c+dc;
       if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS) setB.add(nr*COLS+nc);
     }
-    const brokenB=applyRockDamage(setB);
+    for(const k of [...setB]){ if(isRock(board[Math.floor(k/COLS)][k%COLS])) setB.delete(k); }
     const cells=[...setB].map(k=>({r:Math.floor(k/COLS),c:k%COLS}));
     spawnGemBurst(cells,'#ffaa0044');
     log(`BOMBA — ${cells.length} piezas.`,'warn');
     await wait(300);
-    collectBroken(brokenB);
     const pts=cells.filter(({r,c})=>!isRock(board[r][c])).length*80;
     score+=pts;
     cells.forEach(({r,c})=>{ board[r][c]=null; cellDom[r][c]?.remove(); cellDom[r][c]=null; });
     spawnScorePopup(r,c,pts,'#ffaa00');
     bumpStat('score'); updateUI();
     await wait(100);
-    dropTiles(); fillBoard(); renderBoard();
+    const exP=dropTiles(); fillBoard(); renderBoard(); if(exP.length) collectExits(exP,[]);
     await wait(200);
     const m2=findMatches();
     if(m2.length){ await processMatches(m2); } else { await afterPower(); }
@@ -62,19 +61,18 @@ async function applyPowerupAt(r, c){
     // Destroy entire row
     const setR=new Set();
     for(let cc=0;cc<COLS;cc++) setR.add(r*COLS+cc);
-    const brokenR=applyRockDamage(setR);
+    for(const k of [...setR]){ if(isRock(board[Math.floor(k/COLS)][k%COLS])) setR.delete(k); }
     const cells=[...setR].map(k=>({r:Math.floor(k/COLS),c:k%COLS}));
     spawnGemBurst(cells,'#00e5ff44');
     log(`RAYO — fila ${r+1}.`,'info');
     await wait(300);
-    collectBroken(brokenR);
     const pts2=cells.filter(({r,c})=>!isRock(board[r][c])).length*80;
     score+=pts2;
     cells.forEach(({r,c})=>{ board[r][c]=null; cellDom[r][c]?.remove(); cellDom[r][c]=null; });
     spawnScorePopup(r,Math.floor(COLS/2),pts2,'#00e5ff');
     bumpStat('score'); updateUI();
     await wait(100);
-    dropTiles(); fillBoard(); renderBoard();
+    const exP=dropTiles(); fillBoard(); renderBoard(); if(exP.length) collectExits(exP,[]);
     await wait(200);
     const m3=findMatches();
     if(m3.length){ await processMatches(m3); } else { await afterPower(); }
@@ -96,7 +94,7 @@ async function applyPowerupAt(r, c){
     spawnScorePopup(r,c,pts3,TILE_COLORS[ttype]);
     bumpStat('score'); updateUI();
     await wait(100);
-    dropTiles(); fillBoard(); renderBoard();
+    const exP=dropTiles(); fillBoard(); renderBoard(); if(exP.length) collectExits(exP,[]);
     await wait(200);
     const m4=findMatches();
     if(m4.length){ await processMatches(m4); } else { await afterPower(); }

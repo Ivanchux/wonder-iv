@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>WONDER IV</title>
+<meta name="description" content="Wonder IV, juego de puzles match-3 en el navegador: reconstruye ocho maravillas a través de 24 eras.">
+<meta property="og:title" content="WONDER IV">
+<meta property="og:description" content="Puzle match-3 retro: ocho maravillas, 24 eras, gemas especiales y poderes.">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="css/wonder.css">
+</head>
+<body>
+<canvas id="particle-canvas"></canvas>
+<div class="crt-overlay"></div>
+<div class="vignette"></div>
+
+<!-- ── RETROTERM BREADCRUMB ── -->
+<nav class="rt-nav" aria-label="Navegación">
+  <a href="https://ivanchux.github.io/Retroterm-AI/">RETROTERM.AI</a>
+  <span class="rt-sep">/</span>
+  <span class="rt-cur">WONDER IV</span>
+  <span class="rt-spacer"></span>
+  <button class="rt-theme-btn" id="btn-theme" title="Cambiar tema" aria-label="Cambiar tema">◑</button>
+</nav>
+
+<!-- ══ LEVEL SELECT ══ -->
+<div id="screen-select" class="screen active">
+  <div class="sel-header">
+    <div class="sel-eyebrow">◆ SIETE MARAVILLAS DEL MUNDO DIGITAL ◆</div>
+    <div class="sel-ornament">
+      <div class="sel-ornament-line"></div>
+      <span class="sel-ornament-diamond">◈</span>
+      <div class="sel-ornament-line"></div>
+    </div>
+    <div class="sel-title">WONDER IV</div>
+    <div class="sel-ornament">
+      <div class="sel-ornament-line"></div>
+      <span class="sel-ornament-diamond">◈</span>
+      <div class="sel-ornament-line"></div>
+    </div>
+    <div class="sel-sub">ARQUEOLOGÍA DIGITAL — ELIGE TU MARAVILLA</div>
+  </div>
+  <div class="sel-grid" id="sel-grid"></div>
+  <div class="sel-footer">◆ SELECCIONA UNA MARAVILLA PARA INICIAR LA EXPEDICIÓN ◆</div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;letter-spacing:0.15em;color:#2a1e08;margin-top:10px;padding-bottom:20px;">
+    <a href="https://ivanchux.github.io/Retroterm-AI/" style="color:#4a3010;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#ffaa00'" onmouseout="this.style.color='#4a3010'">⬅ RETROTERM.AI HUB</a>
+  </div>
+</div>
+
+<!-- ══ GAME ══ -->
+<div id="screen-game" class="screen">
+  <div class="header">
+    <div class="header-left">
+      <div class="header-eyebrow">◆ EXPEDICIÓN ACTIVA</div>
+      <div class="header-title">WONDER IV</div>
+      <div class="header-sub">ARQUEOLOGÍA DIGITAL — SERIE ALFA</div>
+    </div>
+    <div class="header-right">
+      <div class="badge-row">
+        <span class="badge badge-on">● ACTIVO</span>
+        <span class="badge badge-lvl" id="badge-lvl">LVL 01</span>
+      </div>
+      <button class="btn-back" onclick="goToSelect()">← MENÚ</button>
+    </div>
+  </div>
+
+  <div class="game-layout">
+    <div class="game-left">
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-lbl">PUNTOS</div>
+          <div class="stat-val sv-score" id="score">0</div>
+        </div>
+        <div class="stat-box" id="stat-moves-box">
+          <div class="stat-lbl">MOVS</div>
+          <div class="stat-val sv-moves" id="moves">40</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-lbl">COMBO</div>
+          <div class="stat-val sv-combo" id="combo">×1</div>
+        </div>
+      </div>
+
+      <!-- OBJETIVOS -->
+      <div class="objectives-panel">
+        <div class="obj-title">OBJETIVOS DE ERA</div>
+        <div class="obj-list" id="obj-list"></div>
+      </div>
+
+      <!-- TABLERO -->
+      <div class="board-wrap" id="board-wrap">
+        <div id="board"></div>
+        <div class="swipe-ghost" id="swipe-ghost"></div>
+      </div>
+
+      <!-- POWER-UPS -->
+      <div class="powerups-panel">
+        <div class="pu-title">PODERES ESPECIALES</div>
+        <div class="pu-list">
+          <div class="pu-btn" id="pu-bomb" onclick="activatePowerup('bomb')">
+            <span class="pu-count" id="pu-bomb-count">2</span>
+            <span class="pu-icon">💥</span>
+            <span class="pu-name">BOMBA</span>
+          </div>
+          <div class="pu-btn" id="pu-ray" onclick="activatePowerup('ray')">
+            <span class="pu-count" id="pu-ray-count">2</span>
+            <span class="pu-icon">⚡</span>
+            <span class="pu-name">RAYO</span>
+          </div>
+          <div class="pu-btn" id="pu-shuffle" onclick="activatePowerup('shuffle')">
+            <span class="pu-count" id="pu-shuffle-count">1</span>
+            <span class="pu-icon">🔀</span>
+            <span class="pu-name">REVOLVER</span>
+          </div>
+          <div class="pu-btn" id="pu-color" onclick="activatePowerup('color')">
+            <span class="pu-count" id="pu-color-count">1</span>
+            <span class="pu-icon">✨</span>
+            <span class="pu-name">AURORA</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="log-panel">
+        <div class="log-section-title">REGISTRO DE EXCAVACIÓN</div>
+        <div id="log"></div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-rst"  onclick="restartLevel()">⟳ REINICIAR</button>
+        <button class="btn btn-hint" onclick="doHint()">◈ SUGERIR</button>
+      </div>
+    </div>
+
+    <div class="game-right">
+      <div class="wonder-scene">
+        <canvas class="scene-bg-canvas" id="scene-canvas"></canvas>
+        <div class="wonder-label">OBJETIVO ACTIVO</div>
+        <div class="wonder-name" id="wonder-name">—</div>
+        <div class="wonder-desc" id="wonder-desc">—</div>
+        <div class="ascii-wrap">
+          <div id="ascii-art"></div>
+        </div>
+        <div class="prog-wrap">
+          <div class="prog-era-label">
+            <span id="era-label-text">ERA I</span>
+            <span id="prog-text">0 / 0</span>
+          </div>
+          <div class="prog-track" id="prog-track"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CARD DE ERA — toast -->
+<div id="era-card" onclick="dismissEraCard()">
+  <div class="era-inner">
+    <div class="era-eyebrow">NUEVA ÉPOCA DESBLOQUEADA</div>
+    <div class="era-title" id="era-title">ERA II</div>
+    <div class="era-desc" id="era-desc">Los cimientos se asientan.</div>
+    <div class="era-bonus">
+      <div class="era-bonus-title">BONUS</div>
+      <div class="era-bonus-val" id="era-bonus-val">×2 PTS</div>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY FINAL -->
+<div id="overlay">
+  <div class="ov-inner">
+    <div class="ov-title" id="ov-title">COMPLETO</div>
+    <div class="ov-sub" id="ov-sub">MARAVILLA RECONSTRUIDA</div>
+    <div class="ov-stars" id="ov-stars">
+      <span class="ov-star" id="ov-s1">★</span>
+      <span class="ov-star" id="ov-s2">★</span>
+      <span class="ov-star" id="ov-s3">★</span>
+    </div>
+    <div class="ov-ascii" id="ov-ascii"></div>
+    <div class="ov-score" id="ov-score"></div>
+    <div class="ov-btns">
+      <button class="btn btn-hint" id="btn-next" onclick="nextLevel()">▶ SIGUIENTE</button>
+      <button class="btn btn-rst"                onclick="restartLevel()">⟳ REINICIAR</button>
+      <button class="btn btn-back" style="color:#4a3010;border-color:#2a1e08" onclick="goToSelect()">← MENÚ</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/state.js"></script>
+<script src="js/screens.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/powerups.js"></script>
+<script src="js/hud.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

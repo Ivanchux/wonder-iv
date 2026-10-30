@@ -24,7 +24,7 @@ Cada nivel es una maravilla que se reconstruye pieza a pieza mientras su arte AS
 
 ## 🔷 Qué es
 
-Wonder IV es un juego de navegador de puzles de combinar tres. El tablero es de 7 × 7 con siete tipos de ficha y cada combinación hace avanzar la reconstrucción de una maravilla, dibujada en arte ASCII que aparece línea a línea. Hay **8 maravillas**, cada una dividida en **3 eras**.
+Wonder IV es un juego de navegador de puzles de combinar tres, con aspecto de maravillas del mundo antiguo: piezas de piedra tallada (sol, anj, escarabajo, loto, laurel, ojo y ánfora, cada una con su color y su silueta), tablero con marco de lapislázuli y oro, marcadores de pergamino y un paisaje de cielo, colinas y columnas. El tablero es de 7 × 7 con siete tipos de ficha y cada combinación hace avanzar la reconstrucción de una maravilla, dibujada en arte ASCII que aparece línea a línea. Hay **8 maravillas**, cada una dividida en **3 eras**.
 
 - Funciona con **ratón y con pantalla táctil**: toca dos fichas contiguas o desliza una de ellas.
 - **Sin librerías, sin instalación y sin paso de compilación**: HTML, CSS y JavaScript planos.
@@ -120,7 +120,8 @@ Al estar en el mismo dominio que RETROTERM.AI, el récord y las estrellas guarda
 - **Fondo de partículas** y arte ASCII animado en canvas y DOM.
 - **Guardado** del récord y las estrellas en `localStorage`, dentro de `try/catch`.
 - **Pruebas:** `tools/bot` ejecuta el código real del motor en Node con un DOM simulado, reloj virtual y semilla fija.
-- **Tipografías** (Cinzel, Share Tech Mono y VT323) cargadas desde Google Fonts. Es la única petición a un tercero.
+- **Tipografía:** Cinzel, incluida en `css/fonts/` (licencia SIL OFL 1.1, ver `css/fonts/OFL.txt`). Ya no hay peticiones a terceros.
+- **Aspecto:** `css/antiguo.css` se carga después de `css/wonder.css` y solo cambia el aspecto; las piezas y el paisaje son SVG propios (`js/data.js` e `index.html`).
 - No tiene sonido ni controles de teclado.
 
 ## 📁 Estructura del repositorio
@@ -128,7 +129,9 @@ Al estar en el mismo dominio que RETROTERM.AI, el récord y las estrellas guarda
 ```text
 wonder-iv/
 ├── index.html        # Marcado de las pantallas (menú, partida, avisos de era, pantalla final)
-├── css/wonder.css    # Todos los estilos
+├── css/wonder.css    # Estilos base y maquetación
+├── css/antiguo.css   # Tema de maravillas antiguas (colores, marcos, tipografía)
+├── css/fonts/        # Cinzel (OFL)
 ├── js/
 │   ├── data.js       # Fichas, gemas en SVG y las maravillas con sus eras  ← los niveles se editan aquí
 │   ├── storage.js    # Récords y estrellas en localStorage

@@ -16,11 +16,34 @@
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="css/wonder.css">
+<link rel="stylesheet" href="css/antiguo.css">
 </head>
 <body>
 <canvas id="particle-canvas"></canvas>
 <div class="crt-overlay"></div>
 <div class="vignette"></div>
+
+<!-- ESCENA DE FONDO: cielo, colinas y columnas, dibujados en SVG propio -->
+<svg class="scene-bg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="sc-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f7fd0"/><stop offset="0.55" stop-color="#7cc0ec"/><stop offset="0.8" stop-color="#cfeaf4"/><stop offset="1" stop-color="#f4e8c8"/></linearGradient>
+    <radialGradient id="sc-sun" cx="0.78" cy="0.2" r="0.5"><stop offset="0" stop-color="#fff8d0" stop-opacity="0.95"/><stop offset="0.25" stop-color="#fff0a8" stop-opacity="0.45"/><stop offset="1" stop-color="#fff0a8" stop-opacity="0"/></radialGradient>
+    <linearGradient id="sc-hill1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7aa860"/><stop offset="1" stop-color="#4c7a38"/></linearGradient>
+    <linearGradient id="sc-hill2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5e9a48"/><stop offset="1" stop-color="#2e6224"/></linearGradient>
+    <linearGradient id="sc-col" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b09468"/><stop offset="0.35" stop-color="#f2e2b8"/><stop offset="0.7" stop-color="#d2b988"/><stop offset="1" stop-color="#8a7248"/></linearGradient>
+    <g id="sc-column"><rect x="-34" y="0" width="68" height="16" rx="3" fill="#e0cc9c" stroke="#6a5030" stroke-width="2"/><path d="M-26 16H26V560H-26Z" fill="url(#sc-col)" stroke="#6a5030" stroke-width="2"/><path d="M-14 16V560M-2 16V560M10 16V560" stroke="#7a6038" stroke-width="2" opacity="0.5"/><rect x="-36" y="560" width="72" height="22" rx="3" fill="#cdb682" stroke="#6a5030" stroke-width="2"/><path d="M-30 0Q-30 -22 -10 -22Q0 -14 10 -22Q30 -22 30 0Z" fill="#e8d6a8" stroke="#6a5030" stroke-width="2"/></g>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sc-sky)"/>
+  <rect width="1600" height="900" fill="url(#sc-sun)"/>
+  <g fill="#fff" opacity="0.9"><ellipse cx="260" cy="150" rx="120" ry="26"/><ellipse cx="330" cy="130" rx="80" ry="26"/><ellipse cx="1180" cy="110" rx="140" ry="24"/><ellipse cx="1250" cy="92" rx="80" ry="24"/><ellipse cx="760" cy="230" rx="100" ry="20"/><ellipse cx="820" cy="214" rx="60" ry="20"/></g>
+  <path d="M0 560Q140 470 300 540T620 520T960 548T1300 500T1600 540V900H0Z" fill="#9ab8c8" opacity="0.55"/>
+  <path d="M0 640Q200 560 420 620T860 600T1260 628T1600 590V900H0Z" fill="url(#sc-hill1)"/>
+  <g transform="translate(1180 520)"><path d="M-110 90H110V70H-110Z" fill="#e6d4a4" stroke="#6a5030" stroke-width="2"/><path d="M-96 70H96V54H-96Z" fill="#d9c28e" stroke="#6a5030" stroke-width="2"/><path d="M-100 54L0 -2L100 54Z" fill="#e8d6a8" stroke="#6a5030" stroke-width="2"/><g fill="#f4e6bc" stroke="#6a5030" stroke-width="1.5"><rect x="-84" y="54" width="14" height="16"/><rect x="-50" y="54" width="14" height="16"/><rect x="-16" y="54" width="14" height="16"/><rect x="18" y="54" width="14" height="16"/><rect x="52" y="54" width="14" height="16"/></g></g>
+  <path d="M0 720Q260 650 520 704T1040 690T1600 700V900H0Z" fill="url(#sc-hill2)"/>
+  <g opacity="0.92"><use href="#sc-column" x="90" y="120" /><use href="#sc-column" x="1510" y="150"/></g>
+  <path d="M0 820Q400 790 800 812T1600 806V900H0Z" fill="#c8a66a"/>
+  <path d="M0 860Q400 836 800 852T1600 848V900H0Z" fill="#a8844a"/>
+</svg>
 
 <!-- ── RETROTERM BREADCRUMB ── -->
 <nav class="rt-nav" aria-label="Navegación">
@@ -57,6 +80,14 @@
 
 <!-- ══ GAME ══ -->
 <div id="screen-game" class="screen">
+  <div class="workers" aria-hidden="true">
+    <svg viewBox="0 0 1600 100" preserveAspectRatio="xMidYMax meet" focusable="false">
+      <defs>
+        <g id="wk"><ellipse cx="0" cy="-30" rx="9" ry="10" fill="#e8b890" stroke="#4a2c10" stroke-width="1.6"/><path d="M-9 -34Q0 -46 9 -34Z" fill="#f2d27a" stroke="#4a2c10" stroke-width="1.4"/><path d="M-8 -20H8L10 6H-10Z" fill="#f4ecd8" stroke="#4a2c10" stroke-width="1.6"/><path d="M-6 6V18M6 6V18" stroke="#4a2c10" stroke-width="3" stroke-linecap="round"/><rect x="-12" y="-26" width="24" height="12" rx="2" fill="#d9bd8a" stroke="#4a2c10" stroke-width="1.6"/></g>
+      </defs>
+      <g class="wk-row"><use href="#wk" x="120" y="82"/><use href="#wk" x="420" y="82"/><use href="#wk" x="760" y="82"/><use href="#wk" x="1100" y="82"/><use href="#wk" x="1400" y="82"/></g>
+    </svg>
+  </div>
   <div class="header">
     <div class="header-left">
       <div class="header-eyebrow">◆ EXPEDICIÓN ACTIVA</div>

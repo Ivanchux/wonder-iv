@@ -1,5 +1,13 @@
 # Registro de cambios
 
+## 1.2 · Fase 2: el nivel se rehace
+- **Rocas de material** (piedra, ladrillo, mármol, madera y bronce) en el tablero: no se mueven ni combinan, y se rompen con combinaciones de al lado o con explosiones. Algunas aguantan un golpe más y dan dos bloques.
+- **Operarios** que recogen lo que suelta cada roca y lo llevan andando hasta el solar, donde se coloca el siguiente bloque de la maravilla.
+- **Siete maravillas** clásicas (Gran Pirámide, Jardines Colgantes, Estatua de Zeus, Templo de Artemisa, Mausoleo de Halicarnaso, Coloso de Rodas y Faro de Alejandría), dibujadas en SVG por bloques en `js/maravillas.js`. Desaparecen las eras, los objetivos por tipo de pieza y el arte ASCII.
+- **Pantalla de nivel nueva:** solar a la izquierda, tablero entre dos columnas, marcador vertical de movimientos, marcadores de pergamino, poderes bajo el tablero y camino de operarios abajo. En el móvil se apila.
+- Los materiales recogidos se guardan en el navegador (`wonder_stock`) para el asentamiento.
+- Se corrige que una gema de línea o de área sola diera el tablero por «sin movimientos», y el «revolver» ya no deja combinaciones hechas.
+
 ## 1.1 · Fase 1 visual: maravillas antiguas
 - Siete piezas nuevas de piedra tallada, con color, silueta y símbolo distintos: sol, anj, escarabajo, loto, laurel, ojo y ánfora. Las gemas de línea y de área también se rediseñan (sello alado y sol radiante).
 - Tablero en una losa con marco de lapislázuli y oro, marcadores y botones de cartucho dorado, paneles de pergamino y tablilla tallada para la maravilla.

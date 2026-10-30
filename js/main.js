@@ -3,9 +3,7 @@
 // ════════════════════════════════════════
 //  BOOT
 // ════════════════════════════════════════
-window.addEventListener('resize',()=>{ resizeParticles(); drawSceneBg(); invalidateMetrics(); relayoutBoard(); });
-initParticles();
-tickParticles();
+window.addEventListener('resize',()=>{ invalidateMetrics(); relayoutBoard(); });
 buildSelectScreen();
 
 // Botón ◑ — modo claro/oscuro propio del juego

@@ -9,7 +9,6 @@ function showScreen(id) {
 }
 function goToSelect() {
   document.getElementById('overlay').classList.remove('show');
-  document.getElementById('era-card').classList.remove('show');
   showScreen('screen-select');
 }
 
@@ -35,10 +34,10 @@ function buildSelectScreen() {
       `</div>` +
       `<div class="wc-title">${w.name}</div>` +
       `<div class="wc-desc">${w.desc}</div>` +
-      `<div class="wc-ascii">${w.ascii.join('\n')}</div>` +
+      `<div class="wc-scene">${wonderSceneSVG(w.id, getBestStars(i)>0?w.stages:0)}</div>` +
       `<div class="wc-meta">` +
         `<span class="wc-tag diff-${w.diff}">${diffLabel(w.diff)}</span>` +
-        `<span class="wc-tag">${w.stages} ETAPAS</span>` +
+        `<span class="wc-tag">${w.rocks.length} ROCAS</span>` +
         `<span class="wc-tag">${w.movs} MOVS</span>` +
         `<span class="wc-tag">${w.year}</span>` +
         (best > 0 ? `<span class="wc-tag" style="color:#ffaa0077">MEJOR: ${best}</span>` : '') +

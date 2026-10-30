@@ -83,192 +83,27 @@ function gemAreaSVG(){
   <circle cx="26" cy="26" r="4" fill="#e8502a" stroke="#6a2208" stroke-width="1"/></svg>`;
 }
 
-// 3 Eras por nivel, objetivos de ficha por era
+// ── MATERIALES ──────────────────────────────
+// Cada maravilla se construye con un material. Al romper una roca se recoge y los operarios lo llevan al solar.
+const MATERIALS = {
+  piedra:   { name:'PIEDRA',   c1:'#e2d2ac', c2:'#b09a6a', c3:'#6a5a38' },
+  ladrillo: { name:'LADRILLO', c1:'#e6a276', c2:'#b8643a', c3:'#6a2e14' },
+  marmol:   { name:'MÁRMOL',   c1:'#fffaf0', c2:'#d8d4c8', c3:'#8a8678' },
+  madera:   { name:'MADERA',   c1:'#d8a468', c2:'#9a6a34', c3:'#503010' },
+  bronce:   { name:'BRONCE',   c1:'#ffd28a', c2:'#cf8a3a', c3:'#7a4410' },
+};
+
+// ── LAS SIETE MARAVILLAS ──────────────────────────────
+// stages = bloques que hay que colocar (la suma de la resistencia de todas las rocas).
+// rocks = resistencia de cada roca (1 = se rompe con una combinación al lado, 2 = aguanta una más y da dos bloques).
+// Para añadir o equilibrar niveles, edita este array y las escenas de js/maravillas.js.
 const WONDERS = [
-  {
-    name:'LA PIRÁMIDE', desc:'Primer algoritmo registrado — 2560 a.C.',
-    year:'2560 A.C.', diff:'easy', stages:9, movs:48,
-    eras:[
-      { name:'ERA I — FUNDAMENTOS',  bonus:'×1.5 puntos', scoreBonus:1.5, desc:'Las primeras piedras son puestas. El saber abre camino.', objType:1, objCount:18 },
-      { name:'ERA II — ELEVACIÓN',   bonus:'×2 puntos',   scoreBonus:2,   desc:'La estructura emerge. Cada pieza es crucial.', objType:4, objCount:22 },
-      { name:'ERA III — CORONACIÓN', bonus:'×3 puntos',   scoreBonus:3,   desc:'La cima se alcanza. La maravilla se completa.', objType:2, objCount:28 },
-    ],
-    ascii:[
-      '            /\\            ',
-      '           /··\\           ',
-      '          /·  ·\\          ',
-      '         / ·  · \\         ',
-      '        /··    ··\\        ',
-      '       / ········ \\       ',
-      '      /············\\      ',
-      '     /______________\\     ',
-      '    /________________\\    ',
-    ]
-  },
-  {
-    name:'EL FARO', desc:'Primer compilador funcional — 1952 d.C.',
-    year:'1952 D.C.', diff:'easy', stages:9, movs:44,
-    eras:[
-      { name:'ERA I — BASE',         bonus:'×1.5 puntos', scoreBonus:1.5, desc:'El cimiento del faro se asienta sobre roca viva.', objType:0, objCount:18 },
-      { name:'ERA II — TORRE',       bonus:'×2 puntos',   scoreBonus:2,   desc:'La torre se eleva hacia el horizonte.', objType:3, objCount:22 },
-      { name:'ERA III — LUZ',        bonus:'×3 puntos',   scoreBonus:3,   desc:'La luz guía a los navegantes a través de la oscuridad.', objType:5, objCount:26 },
-    ],
-    ascii:[
-      '          *·*·*           ',
-      '          |·|·|           ',
-      '         [=====]          ',
-      '          | · |           ',
-      '         /|   |\\          ',
-      '        / | · | \\         ',
-      '       /  |   |  \\        ',
-      '      /   | · |   \\       ',
-      '     [_____________]      ',
-    ]
-  },
-  {
-    name:'LOS JARDINES', desc:'Primer sistema operativo — 1969 d.C.',
-    year:'1969 D.C.', diff:'medium', stages:12, movs:42,
-    eras:[
-      { name:'ERA I — TIERRA',       bonus:'×1.5 puntos', scoreBonus:1.5, desc:'La tierra fértil acoge las primeras semillas del saber.', objType:4, objCount:20 },
-      { name:'ERA II — TERRAZA',     bonus:'×2 puntos',   scoreBonus:2,   desc:'Las terrazas ascienden, verdes y exuberantes.', objType:1, objCount:24 },
-      { name:'ERA III — EDÉN',       bonus:'×3 puntos',   scoreBonus:3,   desc:'El jardín colgante desafía las leyes de la naturaleza.', objType:6, objCount:30 },
-    ],
-    ascii:[
-      '  ~*~ ~*~ ~*~ ~*~ ~*~    ',
-      '  |\\|  |\\|  |\\|  |\\|  |  ',
-      '  | ·  | ·  | ·  | ·  |  ',
-      '  |    |    |    |    |  ',
-      ' _|____|____|____|____|_ ',
-      '|   ___________________  |',
-      '|  |  ·  ·  ·  ·  ·   | |',
-      '|__|___________________|_|',
-      '|________________________|',
-      '   |___________________|  ',
-      '       |___________|      ',
-      '           |___|          ',
-    ]
-  },
-  {
-    name:'EL COLOSO', desc:'Primer kernel de red — 1983 d.C.',
-    year:'1983 D.C.', diff:'medium', stages:12, movs:40,
-    eras:[
-      { name:'ERA I — PEDESTAL',     bonus:'×1.5 puntos', scoreBonus:1.5, desc:'El pedestal aguarda al gigante que habrá de alzarse.', objType:2, objCount:20 },
-      { name:'ERA II — CUERPO',      bonus:'×2.5 puntos', scoreBonus:2.5, desc:'El cuerpo de bronce toma forma, imponente y eterno.', objType:0, objCount:26 },
-      { name:'ERA III — COLOSO',     bonus:'×3 puntos',   scoreBonus:3,   desc:'El gigante se yergue sobre el puerto, inmortal.', objType:5, objCount:32 },
-    ],
-    ascii:[
-      '         ·O·              ',
-      '        /|·|\\             ',
-      '       / | · \\            ',
-      '      /  |   |\\           ',
-      '     /   | · | \\          ',
-      '    /    |   |  \\         ',
-      '   /_____|·__|___\\        ',
-      '  /···············\\       ',
-      ' /·················\\      ',
-      '|_____________________|   ',
-      '|_|_________________|_|   ',
-      '  |_________________|     ',
-    ]
-  },
-  {
-    name:'EL TEMPLO', desc:'Primer motor de búsqueda — 1990 d.C.',
-    year:'1990 D.C.', diff:'hard', stages:12, movs:38,
-    eras:[
-      { name:'ERA I — COLUMNAS',     bonus:'×2 puntos',   scoreBonus:2,   desc:'Las columnas jónicas surgen del mármol puro.', objType:1, objCount:22 },
-      { name:'ERA II — FRONTÓN',     bonus:'×2.5 puntos', scoreBonus:2.5, desc:'El frontón esculpido narra la historia de los dioses.', objType:3, objCount:28 },
-      { name:'ERA III — SANTUARIO',  bonus:'×3.5 puntos', scoreBonus:3.5, desc:'El santuario interior guarda los secretos divinos.', objType:6, objCount:36 },
-    ],
-    ascii:[
-      '  /\\  /\\  /\\  /\\  /\\      ',
-      ' /  \\/  \\/  \\/  \\/  \\     ',
-      '|  ||  ||  ||  ||  ||    ',
-      '| ·|| ·|| ·|| ·|| ·||    ',
-      '|  ||  ||  ||  ||  ||    ',
-      '|__|__|__|__|__|__|__|    ',
-      '|                    |   ',
-      '|  ·   ·   ·   ·  ·  |   ',
-      '|____________________|   ',
-      '  |________________|     ',
-      '   |______________|      ',
-      '    |____________|       ',
-    ]
-  },
-  {
-    name:'LA ESTATUA', desc:'Primer protocolo P2P — 2001 d.C.',
-    year:'2001 D.C.', diff:'hard', stages:14, movs:36,
-    eras:[
-      { name:'ERA I — ARMAZÓN',      bonus:'×2 puntos',   scoreBonus:2,   desc:'El armazón interno define la pose de la eternidad.', objType:5, objCount:24 },
-      { name:'ERA II — FORMA',       bonus:'×2.5 puntos', scoreBonus:2.5, desc:'El mármol revela la figura que siempre estuvo dentro.', objType:2, objCount:30 },
-      { name:'ERA III — GLORIA',     bonus:'×4 puntos',   scoreBonus:4,   desc:'La obra maestra desafía el paso del tiempo.', objType:4, objCount:38 },
-    ],
-    ascii:[
-      '        ·(O)·             ',
-      '       /·|||·\\            ',
-      '      / ·|||· \\           ',
-      '        ·|||·             ',
-      '       / |·| \\            ',
-      '      /  | |  \\           ',
-      '     /   | |   \\          ',
-      '    /____|_|____\\         ',
-      '   /____________\\         ',
-      '  |______________|        ',
-      ' /________________\\       ',
-      '|__________________|      ',
-      ' |________________|       ',
-      '  |______________|        ',
-    ]
-  },
-  {
-    name:'LA TUMBA', desc:'Primera red neuronal masiva — 2012 d.C.',
-    year:'2012 D.C.', diff:'expert', stages:15, movs:32,
-    eras:[
-      { name:'ERA I — CÁMARA',       bonus:'×2.5 puntos', scoreBonus:2.5, desc:'La cámara sellada guarda secretos milenarios.', objType:3, objCount:26 },
-      { name:'ERA II — LABERINTO',   bonus:'×3 puntos',   scoreBonus:3,   desc:'El laberinto de pasillos confunde a los profanos.', objType:0, objCount:32 },
-      { name:'ERA III — ETERNIDAD',  bonus:'×4 puntos',   scoreBonus:4,   desc:'La eternidad se graba en la piedra para siempre.', objType:6, objCount:40 },
-    ],
-    ascii:[
-      ' ________________________ ',
-      '|  ____________________  |',
-      '| |  ________________  | |',
-      '| | |  ____________  | | |',
-      '| | | |  ________  | | | |',
-      '| | | | |  ____  | | | | |',
-      '| | | | | |    | | | | | |',
-      '| | | | | | ·· | | | | | |',
-      '| | | | |______| | | | | |',
-      '| | | |__________| | | | |',
-      '| | |______________| | | |',
-      '| |__________________| | |',
-      '|________________________|',
-      ' |_____________________|  ',
-      '   |_________________|    ',
-    ]
-  },
-  {
-    name:'EL ORÁCULO', desc:'Singularidad computacional — 2045 d.C.',
-    year:'2045 D.C.', diff:'expert', stages:15, movs:28,
-    eras:[
-      { name:'ERA I — DESPERTAR',    bonus:'×3 puntos',   scoreBonus:3,   desc:'La chispa inicial enciende la llama de la conciencia.', objType:2, objCount:28 },
-      { name:'ERA II — ASCENSIÓN',   bonus:'×3.5 puntos', scoreBonus:3.5, desc:'La mente trasciende los límites de lo humano.', objType:5, objCount:36 },
-      { name:'ERA III — SINGULARIDAD',bonus:'×5 puntos',  scoreBonus:5,   desc:'El Oráculo ve todo. El Oráculo lo sabe todo.', objType:1, objCount:44 },
-    ],
-    ascii:[
-      '      ·*·*·*·*·*·         ',
-      '     /·····[·]···\\        ',
-      '    / ·[·······]· \\       ',
-      '   / ·[·[·····]·]· \\      ',
-      '  / ·[·[·[···]·]·]· \\     ',
-      ' / ·[·[·[·[·]·]·]·]· \\    ',
-      '/·[·[·[·[·[·]·]·]·]·]·\\   ',
-      '|·[·[·[·[·[·]·]·]·]·]·|   ',
-      '|·[·[·[·[·[·]·]·]·]·]·|   ',
-      '\\·[·[·[·[·[·]·]·]·]·]/    ',
-      ' \\·[·[·[·[·]·]·]·]/       ',
-      '  \\·[·[·[·]·]·]/          ',
-      '   \\·[·[·]·]/             ',
-      '    \\·[·]/                ',
-      '     \\·/                  ',
-    ]
-  },
+  { id:'piramide', name:'GRAN PIRÁMIDE', place:'Guiza, Egipto', year:'c. 2560 A.C.', diff:'easy',   mat:'piedra',   movs:42, rocks:[1,1,1,1,1,1,1,1] },
+  { id:'jardines', name:'JARDINES COLGANTES', place:'Babilonia', year:'c. 600 A.C.',   diff:'easy',   mat:'ladrillo', movs:42, rocks:[1,1,1,1,1,1,1,1,1] },
+  { id:'zeus',     name:'ESTATUA DE ZEUS', place:'Olimpia, Grecia', year:'c. 435 A.C.', diff:'medium', mat:'marmol',   movs:40, rocks:[2,2,1,1,1,1,1,1] },
+  { id:'artemisa', name:'TEMPLO DE ARTEMISA', place:'Éfeso', year:'c. 550 A.C.',      diff:'medium', mat:'madera',   movs:40, rocks:[2,2,2,1,1,1,1,1] },
+  { id:'mausoleo', name:'MAUSOLEO DE HALICARNASO', place:'Halicarnaso', year:'c. 350 A.C.', diff:'hard', mat:'marmol', movs:38, rocks:[2,2,2,2,1,1,1,1] },
+  { id:'coloso',   name:'COLOSO DE RODAS', place:'Rodas', year:'c. 280 A.C.',          diff:'hard',   mat:'bronce',   movs:38, rocks:[2,2,2,2,2,1,1,1] },
+  { id:'faro',     name:'FARO DE ALEJANDRÍA', place:'Alejandría, Egipto', year:'c. 280 A.C.', diff:'expert', mat:'piedra', movs:36, rocks:[2,2,2,2,2,2,1,1] },
 ];
+WONDERS.forEach(w=>{ w.stages=w.rocks.reduce((a,b)=>a+b,0); w.desc=w.place+' — '+w.year; });

@@ -17,11 +17,9 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="css/wonder.css">
 <link rel="stylesheet" href="css/antiguo.css">
+<link rel="stylesheet" href="css/nivel.css">
 </head>
 <body>
-<canvas id="particle-canvas"></canvas>
-<div class="crt-overlay"></div>
-<div class="vignette"></div>
 
 <!-- ESCENA DE FONDO: cielo, colinas y columnas, dibujados en SVG propio -->
 <svg class="scene-bg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
@@ -80,127 +78,56 @@
 
 <!-- ══ GAME ══ -->
 <div id="screen-game" class="screen">
-  <div class="workers" aria-hidden="true">
-    <svg viewBox="0 0 1600 100" preserveAspectRatio="xMidYMax meet" focusable="false">
-      <defs>
-        <g id="wk"><ellipse cx="0" cy="-30" rx="9" ry="10" fill="#e8b890" stroke="#4a2c10" stroke-width="1.6"/><path d="M-9 -34Q0 -46 9 -34Z" fill="#f2d27a" stroke="#4a2c10" stroke-width="1.4"/><path d="M-8 -20H8L10 6H-10Z" fill="#f4ecd8" stroke="#4a2c10" stroke-width="1.6"/><path d="M-6 6V18M6 6V18" stroke="#4a2c10" stroke-width="3" stroke-linecap="round"/><rect x="-12" y="-26" width="24" height="12" rx="2" fill="#d9bd8a" stroke="#4a2c10" stroke-width="1.6"/></g>
-      </defs>
-      <g class="wk-row"><use href="#wk" x="120" y="82"/><use href="#wk" x="420" y="82"/><use href="#wk" x="760" y="82"/><use href="#wk" x="1100" y="82"/><use href="#wk" x="1400" y="82"/></g>
-    </svg>
-  </div>
-  <div class="header">
-    <div class="header-left">
-      <div class="header-eyebrow">◆ EXPEDICIÓN ACTIVA</div>
-      <div class="header-title">WONDER IV</div>
-      <div class="header-sub">ARQUEOLOGÍA DIGITAL — SERIE ALFA</div>
-    </div>
-    <div class="header-right">
-      <div class="badge-row">
-        <span class="badge badge-on">● ACTIVO</span>
-        <span class="badge badge-lvl" id="badge-lvl">LVL 01</span>
-      </div>
-      <button class="btn-back" onclick="goToSelect()">← MENÚ</button>
+  <!-- Marcadores como rollos de pergamino -->
+  <div class="g-hud">
+    <div class="scroll scroll-score"><span class="sc-lbl">PUNTOS</span><span class="sc-val sv-score" id="score">0</span></div>
+    <div class="scroll scroll-level"><span class="sc-lbl" id="badge-lvl">NIVEL 01</span><span class="sc-name" id="wonder-name">—</span></div>
+    <div class="g-hud-right">
+      <button class="btn btn-small" id="btn-hint" onclick="doHint()" title="Sugerir un movimiento">◈ SUGERIR</button>
+      <button class="btn btn-small" onclick="restartLevel()" title="Reiniciar">⟳</button>
+      <button class="btn btn-small btn-back" onclick="goToSelect()">← MENÚ</button>
     </div>
   </div>
 
-  <div class="game-layout">
-    <div class="game-left">
-      <div class="stats-row">
-        <div class="stat-box">
-          <div class="stat-lbl">PUNTOS</div>
-          <div class="stat-val sv-score" id="score">0</div>
-        </div>
-        <div class="stat-box" id="stat-moves-box">
-          <div class="stat-lbl">MOVS</div>
-          <div class="stat-val sv-moves" id="moves">40</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-lbl">COMBO</div>
-          <div class="stat-val sv-combo" id="combo">×1</div>
-        </div>
-      </div>
+  <div class="g-main">
+    <!-- Solar: la maravilla se va levantando con lo que traen los operarios -->
+    <aside class="g-site" aria-label="Solar de la maravilla">
+      <div class="site-top"><span class="site-label">EN CONSTRUCCIÓN</span><span class="site-count"><span id="prog-text">0 / 0</span> BLOQUES</span></div>
+      <div id="site-scene" class="site-scene"></div>
+      <div class="site-desc" id="wonder-desc">—</div>
+    </aside>
 
-      <!-- OBJETIVOS -->
-      <div class="objectives-panel">
-        <div class="obj-title">OBJETIVOS DE ERA</div>
-        <div class="obj-list" id="obj-list"></div>
-      </div>
-
-      <!-- TABLERO -->
+    <!-- Tablero entre dos columnas -->
+    <section class="g-boardcol">
+      <svg class="pillar pl" viewBox="-40 -30 80 640" aria-hidden="true" focusable="false"><use href="#sc-column" x="0" y="0"/></svg>
       <div class="board-wrap" id="board-wrap">
         <div id="board"></div>
         <div class="swipe-ghost" id="swipe-ghost"></div>
       </div>
-
-      <!-- POWER-UPS -->
-      <div class="powerups-panel">
-        <div class="pu-title">PODERES ESPECIALES</div>
-        <div class="pu-list">
-          <div class="pu-btn" id="pu-bomb" onclick="activatePowerup('bomb')">
-            <span class="pu-count" id="pu-bomb-count">2</span>
-            <span class="pu-icon">💥</span>
-            <span class="pu-name">BOMBA</span>
-          </div>
-          <div class="pu-btn" id="pu-ray" onclick="activatePowerup('ray')">
-            <span class="pu-count" id="pu-ray-count">2</span>
-            <span class="pu-icon">⚡</span>
-            <span class="pu-name">RAYO</span>
-          </div>
-          <div class="pu-btn" id="pu-shuffle" onclick="activatePowerup('shuffle')">
-            <span class="pu-count" id="pu-shuffle-count">1</span>
-            <span class="pu-icon">🔀</span>
-            <span class="pu-name">REVOLVER</span>
-          </div>
-          <div class="pu-btn" id="pu-color" onclick="activatePowerup('color')">
-            <span class="pu-count" id="pu-color-count">1</span>
-            <span class="pu-icon">✨</span>
-            <span class="pu-name">AURORA</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="log-panel">
-        <div class="log-section-title">REGISTRO DE EXCAVACIÓN</div>
-        <div id="log"></div>
-      </div>
-
-      <div class="controls">
-        <button class="btn btn-rst"  onclick="restartLevel()">⟳ REINICIAR</button>
-        <button class="btn btn-hint" onclick="doHint()">◈ SUGERIR</button>
-      </div>
+      <svg class="pillar pr" viewBox="-40 -30 80 640" aria-hidden="true" focusable="false"><use href="#sc-column" x="0" y="0"/></svg>
+      <div class="pu-list" id="pu-list">
+      <button class="pu-btn" id="pu-bomb"    onclick="activatePowerup('bomb')"><span class="pu-count" id="pu-bomb-count">2</span><span class="pu-icon">💥</span><span class="pu-name">BOMBA</span></button>
+      <button class="pu-btn" id="pu-ray"     onclick="activatePowerup('ray')"><span class="pu-count" id="pu-ray-count">2</span><span class="pu-icon">⚡</span><span class="pu-name">RAYO</span></button>
+      <button class="pu-btn" id="pu-shuffle" onclick="activatePowerup('shuffle')"><span class="pu-count" id="pu-shuffle-count">1</span><span class="pu-icon">🔀</span><span class="pu-name">REVOLVER</span></button>
+      <button class="pu-btn" id="pu-color"   onclick="activatePowerup('color')"><span class="pu-count" id="pu-color-count">1</span><span class="pu-icon">✨</span><span class="pu-name">AURORA</span></button>
     </div>
+    </section>
 
-    <div class="game-right">
-      <div class="wonder-scene">
-        <canvas class="scene-bg-canvas" id="scene-canvas"></canvas>
-        <div class="wonder-label">OBJETIVO ACTIVO</div>
-        <div class="wonder-name" id="wonder-name">—</div>
-        <div class="wonder-desc" id="wonder-desc">—</div>
-        <div class="ascii-wrap">
-          <div id="ascii-art"></div>
-        </div>
-        <div class="prog-wrap">
-          <div class="prog-era-label">
-            <span id="era-label-text">ERA I</span>
-            <span id="prog-text">0 / 0</span>
-          </div>
-          <div class="prog-track" id="prog-track"></div>
-        </div>
+    <!-- Marcador vertical de movimientos -->
+    <aside class="g-side">
+      <div class="meter" id="stat-moves-box">
+        <div class="meter-lbl">MOVS</div>
+        <div class="meter-tube"><div class="meter-fill" id="meter-fill"></div></div>
+        <div class="meter-val sv-moves" id="moves">0</div>
       </div>
-    </div>
+      <div class="combo-bubble" title="Combo"><span class="cb-lbl">COMBO</span><span class="cb-val sv-combo" id="combo">×1</span></div>
+    </aside>
   </div>
-</div>
 
-<!-- CARD DE ERA — toast -->
-<div id="era-card" onclick="dismissEraCard()">
-  <div class="era-inner">
-    <div class="era-eyebrow">NUEVA ÉPOCA DESBLOQUEADA</div>
-    <div class="era-title" id="era-title">ERA II</div>
-    <div class="era-desc" id="era-desc">Los cimientos se asientan.</div>
-    <div class="era-bonus">
-      <div class="era-bonus-title">BONUS</div>
-      <div class="era-bonus-val" id="era-bonus-val">×2 PTS</div>
-    </div>
+  <!-- Camino de los operarios y poderes -->
+  <div class="g-bottom">
+    <div class="g-lane" aria-hidden="true"><div class="lane-line"></div></div>
+    <div id="log" class="g-log" role="status" aria-live="polite"></div>
   </div>
 </div>
 
@@ -208,27 +135,30 @@
 <div id="overlay">
   <div class="ov-inner">
     <div class="ov-title" id="ov-title">COMPLETO</div>
-    <div class="ov-sub" id="ov-sub">MARAVILLA RECONSTRUIDA</div>
+    <div class="ov-sub" id="ov-sub">MARAVILLA CONSTRUIDA</div>
     <div class="ov-stars" id="ov-stars">
       <span class="ov-star" id="ov-s1">★</span>
       <span class="ov-star" id="ov-s2">★</span>
       <span class="ov-star" id="ov-s3">★</span>
     </div>
-    <div class="ov-ascii" id="ov-ascii"></div>
+    <div class="ov-scene" id="ov-scene"></div>
+    <div class="ov-mats" id="ov-mats"></div>
     <div class="ov-score" id="ov-score"></div>
     <div class="ov-btns">
       <button class="btn btn-hint" id="btn-next" onclick="nextLevel()">▶ SIGUIENTE</button>
       <button class="btn btn-rst"                onclick="restartLevel()">⟳ REINICIAR</button>
-      <button class="btn btn-back" style="color:#4a3010;border-color:#2a1e08" onclick="goToSelect()">← MENÚ</button>
+      <button class="btn btn-back" onclick="goToSelect()">← MENÚ</button>
     </div>
   </div>
 </div>
 
 <script src="js/data.js"></script>
+<script src="js/maravillas.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/state.js"></script>
 <script src="js/screens.js"></script>
 <script src="js/fx.js"></script>
+<script src="js/rocas.js"></script>
 <script src="js/engine.js"></script>
 <script src="js/powerups.js"></script>
 <script src="js/hud.js"></script>

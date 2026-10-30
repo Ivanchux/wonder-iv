@@ -16,3 +16,15 @@ function getBestStars(idx) {
 function setBestStars(idx, s) {
   try { localStorage.setItem('wonder_stars_' + idx, s); } catch(e){}
 }
+
+// ════════════════════════════════════════
+//  ALMACÉN DE MATERIALES (se usa en el asentamiento)
+// ════════════════════════════════════════
+function getStock() {
+  try { const j = JSON.parse(localStorage.getItem('wonder_stock') || '{}'); return (j && typeof j === 'object') ? j : {}; } catch(e){ return {}; }
+}
+function addStock(mat, n) {
+  const st = getStock(); st[mat] = (st[mat] || 0) + n;
+  try { localStorage.setItem('wonder_stock', JSON.stringify(st)); } catch(e){}
+  return st;
+}

@@ -1,5 +1,5 @@
 /* WONDER IV — estilos */
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=Cinzel:wght@400;700;900&display=swap');
+/* Tipografías: ver css/antiguo.css (Cinzel se sirve desde css/fonts, sin peticiones externas) */
 
 :root {
   --bg:       #05080a;

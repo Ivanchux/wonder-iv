@@ -38,6 +38,7 @@ Las dos añaden jugabilidad y habría que equilibrarlas. La trama, los nombres y
 - Arte original: la ambientación es histórica y no copia el arte, los nombres ni los diseños de ningún juego.
 
 ## Fases
+(La fase 1 está hecha: piezas, marco, marcadores, paisaje y operarios. Los textos y el arte ASCII de las maravillas siguen siendo los de antes.)
 1. **Piezas, marco y HUD** (CSS y `js/data.js`).
 2. **Las siete maravillas** como escenas de bloques.
 3. **Capa alienígena**, si la quieres.

@@ -7,18 +7,10 @@ function isRock(t){ return !!t && t.kind==='rock'; }
 
 // ── Aspecto del bloque (SVG por material) ──
 function rockSVG(mat,blocks){
-  const m=MATERIALS[mat]||MATERIALS.piedra, id='rk'+mat+blocks;
-  return `<svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
-    <linearGradient id="${id}" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="${m.c1}"/><stop offset="0.5" stop-color="${m.c2}"/><stop offset="1" stop-color="${m.c3}"/></linearGradient></defs>
-  <path d="M5 11L13 4H41L48 11V42L41 49H13L5 42Z" fill="${m.c3}" transform="translate(0 2)" opacity="0.5"/>
-  <path d="M5 11L13 4H41L48 11V42L41 49H13L5 42Z" fill="url(#${id})" stroke="#2a1606" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M10 14L15 9H37" fill="none" stroke="#fff" stroke-width="2" opacity="0.5" stroke-linecap="round"/>
-  <path d="M8 26H44M26 8V26M16 26V46M36 26V46" fill="none" stroke="#2a1606" stroke-width="1.4" opacity="0.4"/>
-  ${blocks>1?`<path d="M5 11L13 4H41L48 11V42L41 49H13L5 42Z" fill="none" stroke="#f2d27a" stroke-width="2" transform="translate(26 26) scale(0.84) translate(-26 -26)"/><g fill="#2a1606" opacity="0.75"><circle cx="11" cy="15" r="2"/><circle cx="41" cy="15" r="2"/><circle cx="11" cy="39" r="2"/><circle cx="41" cy="39" r="2"/></g><text x="26" y="33" text-anchor="middle" font-family="Cinzel,Georgia,serif" font-weight="900" font-size="17" fill="#fff6d8" stroke="#2a1606" stroke-width="2.4" paint-order="stroke">×${blocks}</text>`:''}
-  </svg>`;
+  const badge=blocks>1?`<text x="50" y="62" text-anchor="middle" font-family="Cinzel,Georgia,serif" font-weight="900" font-size="34" fill="#fff6d8" stroke="#2a1606" stroke-width="5" paint-order="stroke">×${blocks}</text>`:'';
+  return `<svg viewBox="0 0 100 100" aria-hidden="true"><image href="img/bloques/bloque_${mat}.png" x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMid meet"/>${badge}</svg>`;
 }
 
-// ── Colocación inicial: distribución distinta (y simétrica) por maravilla, en las filas centrales ──
 function placeRocks(w){
   let seed=(level+1)*7919+13; const rnd=()=>{ seed=(seed*16807)%2147483647; return seed/2147483647; };
   const free=[]; for(let r=1;r<=4;r++) for(let c=0;c<=3;c++) free.push([r,c]);

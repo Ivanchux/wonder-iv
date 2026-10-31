@@ -18,11 +18,12 @@
 #screen-game .btn-back:hover { background: var(--oro); color: #14286a; }
 
 /* ── Composición: la maravilla al fondo, el tablero en el centro y los marcadores a la derecha ── */
-.g-main { --bs: min(560px, calc(100vh - 330px), 46vw); display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(150px, 1fr); gap: 0 14px; align-items: end; flex: 1; padding-bottom: 30px; }
-.g-boardcol { position: relative; width: var(--bs); margin: 0 72px; grid-column: 2; }
-.board-wrap { width: 100%; }
-.pillar { position: absolute; bottom: -4px; width: 86px; height: calc(var(--bs) + 96px); z-index: 0; filter: drop-shadow(0 6px 8px rgba(0,0,0,.45)); pointer-events: none; overflow: visible; }
-.pl { left: -78px; } .pr { right: -78px; }
+.g-main { --W: min(640px, calc(100vh - 300px), 46vw); --bs: calc(var(--W) * .7475); display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(150px, 1fr); gap: 0 14px; align-items: end; flex: 1; padding-bottom: 30px; }
+.g-boardcol { position: relative; width: var(--W); margin: 0 calc(var(--W) * .26); grid-column: 2; }
+.board-wrap { width: 100%; aspect-ratio: 800 / 799; position: relative; background: url(../img/marco.png) 0 0 / 100% 100% no-repeat; border: 0; border-radius: 0; padding: 0; box-shadow: none; filter: drop-shadow(0 12px 14px rgba(0,0,0,.5)); }
+.board-wrap #board { position: absolute; left: 12.62%; top: 12.89%; width: 74.75%; border-radius: 4px; }
+.pillar { position: absolute; bottom: -4px; height: calc(var(--W) * 1.02); width: auto; z-index: 0; filter: drop-shadow(0 6px 8px rgba(0,0,0,.45)); pointer-events: none; }
+.pl { left: calc(var(--W) * -.27); } .pr { right: calc(var(--W) * -.27); }
 .g-boardcol .board-wrap { position: relative; z-index: 1; }
 .g-side { grid-column: 3; justify-self: start; }
 
@@ -94,7 +95,7 @@
 /* ── Móvil y tableta: se apila ── */
 @media (max-width: 899px) {
   #screen-game { padding: 46px 10px 0; }
-  .g-main { --bs: min(92vw, 520px); grid-template-columns: minmax(0, 1fr); justify-items: center; align-items: start; }
+  .g-main { --W: min(94vw, 560px); grid-template-columns: minmax(0, 1fr); justify-items: center; align-items: start; }
   .g-bottom { margin-left: -10px; margin-right: -10px; }
   .g-hud { gap: 10px; }
   .scroll { min-width: 0; padding: 6px 22px; }

@@ -109,7 +109,7 @@ body.in-level .scene-bg { display: none; }
   .g-boardcol { margin: 0 auto; grid-column: 1; }
   .g-side { grid-column: 1; justify-self: center; flex-wrap: wrap; gap: 8px; }
   .g-side .pu-list { grid-template-columns: repeat(4, 1fr); width: min(94vw, 440px); }
-  .g-log { display: none; }
+  .g-log, #log { display: none; }
   .pillar { display: none; }
   .site-scene { left: 3%; bottom: 52px; }
   .g-side { flex-direction: row; justify-content: center; align-items: center; width: 100%; padding: 0; }

@@ -71,6 +71,7 @@ function anim(el,frames,opts){ return new Promise(res=>{ const a=el.animate(fram
 // Un bloque sale por abajo del tablero: cae al suelo, aparece un operario, anda hasta él, lo coge y lo lleva a la maravilla.
 async function deliverBlock(fromRect, mat, delayMs, variant){
   pendingDeliveries++;
+  const run=runId, dead=()=>run!==runId;
   const stageIdx=Math.min(WONDERS[level].stages-1, deliveredIdx++);
   const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const feet=groundFeetY();
@@ -79,11 +80,13 @@ async function deliverBlock(fromRect, mat, delayMs, variant){
   const sr=site?site.getBoundingClientRect():{left:60,width:300};
   const dockC=sr.left+sr.width*0.5;                    // centro del solar
   if(delayMs) await new Promise(r=>setTimeout(r,delayMs));
+  if(dead()) return;
   // 1) el bloque cae al suelo
   const blk=mkEl('fall-block',rockSVG(mat,1),bx-B_S/2,fromRect.top+fromRect.height/2-B_S/2,B_S,B_S);
   const groundTop=feet-B_S+4, dy=groundTop-(fromRect.top+fromRect.height/2-B_S/2);
   if(reduce){ blk.style.top=groundTop+'px'; }
   else await anim(blk,[{transform:'translateY(0) rotate(0deg)'},{transform:`translateY(${dy}px) rotate(14deg)`,offset:.7},{transform:`translateY(${dy-8}px) rotate(8deg)`,offset:.85},{transform:`translateY(${dy}px) rotate(10deg)`}],{duration:520,easing:'cubic-bezier(.5,0,.9,.5)'});
+  if(dead()){ blk.remove(); return; }
   spawnDust(bx,feet);
   // 2) aparece un operario a un lado y anda hasta el bloque
   const fromLeft=bx<=innerWidth/2;
@@ -98,21 +101,24 @@ async function deliverBlock(fromRect, mat, delayMs, variant){
     await anim(w,[{opacity:0,transform:'translateX(0)'},{opacity:1,transform:'translateX(0)',offset:.12},{opacity:1,transform:`translateX(${bx-startC}px)`}],{duration:Math.max(500,Math.abs(bx-startC)/0.2),easing:'linear'});
     setC(bx); w.getAnimations().forEach(a=>a.cancel()); w.style.opacity='1';
   }
+  if(dead()){ blk.remove(); w.remove(); return; }
   // 3) se agacha, coge el bloque y se lo lleva en brazos hacia la maravilla
   const carry=carryKey(variant,mat), cz=sprSize(carry,W_H);
   if(!reduce){ w.classList.add('paused'); await anim(w,[{transform:'scaleY(1)'},{transform:'scaleY(.9)'},{transform:'scaleY(1)'}],{duration:420,easing:'ease-in-out'}); w.getAnimations().forEach(a=>a.cancel()); w.classList.remove('paused'); }
   blk.remove();
+  if(dead()){ w.remove(); return; }
   const goLeft=dockC<bx;
   w.innerHTML=sprHTML(carry,W_H,0.85); w.style.width=cz.w+'px'; w.classList.toggle('face-left',goLeft); setC(bx);
   // 4) lo lleva a la maravilla
   if(!reduce) await anim(w,[{transform:'translateX(0)'},{transform:`translateX(${dockC-bx}px)`}],{duration:Math.max(700,Math.abs(dockC-bx)/0.15),easing:'linear'});
+  if(dead()){ w.remove(); return; }
   w.style.left=(dockC-cz.w/2)+'px'; w.getAnimations().forEach(a=>a.cancel());
   placeStage(stageIdx); spawnDust(dockC,feet);
   // 5) deja el bloque y se va
   const back=WORKER_KINDS[variant%4]+'_walk', bz=sprSize(back,W_H);
   w.innerHTML=sprHTML(back,W_H,0.8); w.style.width=bz.w+'px'; setC(dockC); w.classList.toggle('face-left',!goLeft);
   if(!reduce) await anim(w,[{opacity:1,transform:'translateX(0)'},{opacity:0,transform:`translateX(${goLeft?-60:60}px)`}],{duration:900,delay:150,easing:'linear'});
-  w.remove(); pendingDeliveries--;
+  w.remove(); if(!dead()) pendingDeliveries--;
 }
 function spawnDust(x,y){
   const layer=fxLayer();

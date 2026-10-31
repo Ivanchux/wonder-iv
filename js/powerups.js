@@ -114,7 +114,7 @@ function updatePowerups(){
 
 // Tras un poder: ¿se terminó la obra? ¿faltan movimientos? ¿hay jugadas?
 async function afterPower(){
-  if(rocksLeft<=0){ await waitDeliveries(); await wait(300); showWin(); return; }
+  if(rocksLeft<=0){ const run=runId; await waitDeliveries(); await wait(300); if(run===runId) showWin(); return; }
   if(!hasMoves()){ log('Sin movimientos. Revolviendo.','warn'); shuffleBoard(); }
   busy=false;
 }

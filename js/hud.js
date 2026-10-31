@@ -89,10 +89,12 @@ async function showWin(){
 }
 
 function showLose(){
+  const kept=Object.entries(matsGot).map(([m,n])=>[m,Math.floor(n/2)]).filter(([,n])=>n>0);
+  kept.forEach(([m,n])=>addStock(m,n));
   document.getElementById('ov-title').textContent='OBRA PARADA';
   document.getElementById('ov-sub').textContent='SE ACABARON LOS MOVIMIENTOS';
   document.getElementById('ov-scene').innerHTML='';
-  document.getElementById('ov-mats').textContent='';
+  document.getElementById('ov-mats').textContent=kept.length?'Te llevas la mitad: '+kept.map(([m,n])=>`${MATERIALS[m].name} +${n}`).join('  ·  '):'';
   document.getElementById('ov-score').textContent=`${score} PTS`;
   document.getElementById('btn-next').style.display='none';
   ['ov-s1','ov-s2','ov-s3'].forEach(id=>document.getElementById(id).classList.remove('lit'));

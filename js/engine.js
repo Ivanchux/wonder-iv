@@ -11,11 +11,14 @@ function isGem(tile){ return tile?.kind==='gem-line'||tile?.kind==='gem-area'; }
 //  START LEVEL
 // ════════════════════════════════════════
 function startLevel(idx){
+  runId++;
   level=idx; score=0; moves=WONDERS[level].movs;
   combo=1; wonderProg=0; prevProgSegs=0;
   selected=null; busy=false; hintPair=[];
   activePu=null;
   puCounts={...PU_DEFAULTS};
+  // ventajas del asentamiento
+  BUILDINGS.forEach(b=>{ const lv=buildingLevel(b.id); if(!lv) return; if(b.pu) puCounts[b.pu]+=lv; else moves+=2*lv; });
   rocksLeft=WONDERS[level].rocks.length; pendingDeliveries=0; deliveredIdx=0; matsGot={}; siteBuilt=0;
   const fl=document.getElementById('fx-layer'); if(fl) fl.innerHTML='';
   const w=WONDERS[level];
@@ -29,6 +32,7 @@ function startLevel(idx){
   requestAnimationFrame(()=>{ relayoutBoard(); });
   preloadSprites(); renderSite(); fillLane(); updateUI(); updateWonder(); updatePowerups();
   log('Obra iniciada.','dim');
+  { const extra=BUILDINGS.filter(b=>buildingLevel(b.id)).map(b=>b.name.split(' ')[0]).join(', '); if(extra) log('Tu asentamiento ayuda: '+extra.toLowerCase()+'.','info'); }
   log(`${w.name}: rompe las rocas para conseguir ${MATERIALS[w.mat].name}.`, 'info');
 }
 
@@ -217,11 +221,6 @@ async function doSwap(r1,c1,r2,c2){
     log('Sin combinacion.','err'); busy=false; return;
   }
   moves--; combo=1;
-  const mid=getCell(r1,c1);
-  if(mid){
-    const br=mid.getBoundingClientRect(), bw=document.getElementById('board-wrap').getBoundingClientRect();
-    spawnPulse(br.left-bw.left+br.width/2, br.top-bw.top+br.height/2);
-  }
   await processMatches(matches);
 }
 
@@ -289,8 +288,9 @@ async function activateGemSwap(r1,c1,r2,c2,tA,tB){
   if(chain.length){ await wait(80); await processMatches(chain); }
   else {
     combo=1; updateUI();
-    if(rocksLeft<=0){ await waitDeliveries(); await wait(300); showWin(); return; }
-    if(moves<=0){ await wait(400); showLose(); return; }
+    { const run=runId;
+      if(rocksLeft<=0){ await waitDeliveries(); await wait(300); if(run===runId) showWin(); return; }
+      if(moves<=0){ await wait(400); if(run===runId) showLose(); return; } }
     if(!hasMoves()){ log('Sin movimientos. Revolviendo.','warn'); shuffleBoard(); }
     busy=false;
   }
@@ -508,8 +508,9 @@ async function processMatches(matches){
   if(chain.length){ await wait(80); await processMatches(chain); }
   else {
     combo=1; updateUI();
-    if(rocksLeft<=0){ await waitDeliveries(); await wait(300); showWin(); return; }
-    if(moves<=0){ await wait(400); showLose(); return; }
+    { const run=runId;
+      if(rocksLeft<=0){ await waitDeliveries(); await wait(300); if(run===runId) showWin(); return; }
+      if(moves<=0){ await wait(400); if(run===runId) showLose(); return; } }
     if(!hasMoves()){ log('Sin movimientos. Revolviendo.','warn'); shuffleBoard(); }
     busy=false;
   }

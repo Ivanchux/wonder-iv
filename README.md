@@ -2,12 +2,12 @@
 
 <img src="docs/banner.png" alt="Wonder IV" width="100%">
 
-# 🔷 WONDER IV
+# 🏛️ WONDER IV
 
-**Puzle de combinar tres con estética de terminal arqueológica.**
-Cada nivel es una maravilla que se reconstruye pieza a pieza mientras su arte ASCII aparece línea a línea.
+**Puzle de combinar tres donde construyes las siete maravillas del mundo antiguo.**
+Rompe el suelo bajo los bloques de material, mira cómo caen, cómo los obreros se los llevan y cómo tu asentamiento crece.
 
-[![Jugar](https://img.shields.io/badge/▶_JUGAR_AHORA-ffaa00?style=for-the-badge&labelColor=05080a)](https://ivanchux.github.io/wonder-iv/)
+[![Jugar](https://img.shields.io/badge/▶_JUGAR_AHORA-c8902a?style=for-the-badge&labelColor=14286a)](https://ivanchux.github.io/wonder-iv/)
 ![HTML5](https://img.shields.io/badge/HTML5-CSS%20%2B%20JS-e34f26?style=flat-square&logo=html5&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-vanilla-f7df1e?style=flat-square&logo=javascript&logoColor=black)
 ![Dependencias](https://img.shields.io/badge/dependencias-0-success?style=flat-square)
@@ -20,29 +20,32 @@ Cada nivel es una maravilla que se reconstruye pieza a pieza mientras su arte AS
 
 ## 📑 Índice
 
-[Qué es](#-qué-es) · [Capturas](#-capturas) · [En movimiento](#-en-movimiento) · [Cómo se juega](#-cómo-se-juega) · [Las maravillas](#-las-maravillas) · [Ejecutar y publicar](#-ejecutar-y-publicar) · [Detalles técnicos](#-detalles-técnicos) · [Estructura](#-estructura-del-repositorio) · [Licencia](#-licencia)
+[Qué es](#-qué-es) · [Capturas](#-capturas) · [En movimiento](#-en-movimiento) · [Cómo se juega](#-cómo-se-juega) · [El asentamiento](#-el-asentamiento) · [Las maravillas](#-las-maravillas) · [Ejecutar y publicar](#-ejecutar-y-publicar) · [Detalles técnicos](#-detalles-técnicos) · [Estructura](#-estructura-del-repositorio) · [Licencia](#-licencia)
 
-## 🔷 Qué es
+## 🏛️ Qué es
 
-Wonder IV es un juego de navegador de puzles de combinar tres, con aspecto de maravillas del mundo antiguo: piezas de piedra tallada (sol, anj, escarabajo, loto, laurel, ojo y ánfora, cada una con su color y su silueta), tablero con marco de lapislázuli y oro, marcadores de pergamino y un paisaje de cielo, colinas y columnas. El tablero es de 7 × 7 con siete tipos de ficha y cada combinación hace avanzar la reconstrucción de una maravilla, dibujada en arte ASCII que aparece línea a línea. Hay **8 maravillas**, cada una dividida en **3 eras**.
+Wonder IV es un juego de navegador de combinar tres, ambientado en las obras de las siete maravillas del mundo antiguo. El tablero de 7 × 7 está lleno de piezas de piedra tallada y, entre ellas, de **bloques de material** (piedra, ladrillo, mármol, madera o bronce) que no se pueden mover. Para liberarlos hay que despejar lo que tienen debajo: caen por el tablero y, al llegar abajo, salen a la obra, donde **un obrero camina hasta el bloque, lo levanta en brazos y lo lleva al pie de la maravilla**.
 
-- Funciona con **ratón y con pantalla táctil**: toca dos fichas contiguas o desliza una de ellas.
+- Funciona con **ratón y con pantalla táctil**: toca dos piezas contiguas o desliza una de ellas.
 - **Sin librerías, sin instalación y sin paso de compilación**: HTML, CSS y JavaScript planos.
-- El **récord y las estrellas** de cada maravilla se guardan en el navegador.
-- Modo claro y oscuro con el botón de la barra superior.
-- Nació dentro de [RETROTERM.AI](https://ivanchux.github.io/Retroterm-AI/) y ahora vive en su propio repositorio para poder crecer.
+- **Un asentamiento propio** que mejoras con los materiales que recoges.
+- El **récord, las estrellas, los materiales y los edificios** se guardan en el navegador.
+- Sin peticiones a terceros: tipografía, imágenes y sprites van en el repositorio.
+- Nació dentro de [RETROTERM.AI](https://ivanchux.github.io/Retroterm-AI/) y ahora vive en su propio repositorio.
 
 ## 📸 Capturas
 
 <div align="center">
 
-| Menú de maravillas | Partida |
+| Tu asentamiento | Mejorar un edificio |
 |:---:|:---:|
-| <img src="docs/pc-menu.png" width="420"> | <img src="docs/pc-partida.png" width="420"> |
+| <img src="docs/pc-menu.png" width="420"> | <img src="docs/pc-edificio.png" width="420"> |
+
+<img src="docs/pc-partida.png" width="860">
 
 <img src="docs/movil-menu.png" height="440"> &nbsp; <img src="docs/movil-partida.png" height="440">
 
-*En el móvil el tablero ocupa todo el ancho y las fichas se mueven con un toque o deslizando el dedo.*
+*En el móvil el mapa del asentamiento se desliza hacia los lados y el tablero ocupa todo el ancho.*
 
 </div>
 
@@ -50,9 +53,9 @@ Wonder IV es un juego de navegador de puzles de combinar tres, con aspecto de ma
 
 <div align="center">
 
-**En el PC:** combinaciones, puntuación flotante y la pirámide apareciendo línea a línea
+**En el PC:** el bloque queda libre, cae y los obreros lo recogen para el montón de la obra
 
-<img src="docs/gifs/pc-partida.gif" width="600">
+<img src="docs/gifs/pc-partida.gif" width="640">
 
 **En el móvil**
 
@@ -62,44 +65,55 @@ Wonder IV es un juego de navegador de puzles de combinar tres, con aspecto de ma
 
 ## 🎮 Cómo se juega
 
-- Tablero de 7 × 7 con siete tipos de ficha: DELTA, LAMBDA, ORBIT, HEX, TARGET, NODE y CORE.
-- Intercambia dos fichas contiguas para alinear tres o más del mismo tipo.
-- Cada combinación hace avanzar la reconstrucción de la maravilla. Al completar
-  todas sus etapas antes de quedarte sin movimientos, ganas el nivel.
-- **Eras.** Cada maravilla se divide en tres eras. Cada era pide recoger una
-  cantidad de un tipo de ficha concreto y multiplica la puntuación (de ×1,5 a ×5).
-- **Gemas especiales.**
-  - Alinear 4 crea una **gema de línea**: al usarla limpia su fila y su columna.
-  - Alinear 5 o más crea una **gema de área**: limpia un cuadrado de 3 × 3.
-  - Intercambiar dos gemas entre sí provoca una explosión combinada.
-- **Poderes**, de uso limitado por nivel: BOMBA, RAYO, REVOLVER (baraja el tablero) y AURORA.
-- **Estrellas.** Se ganan según los movimientos que sobran al terminar:
-  tres estrellas con el 40 % o más, dos con el 15 % o más, una en el resto.
-- El récord y las estrellas de cada maravilla se guardan en el navegador.
+- Tablero de 7 × 7 con **siete piezas**: sol, anj, escarabajo, loto, laurel, ojo de Horus y ánfora, cada una con su color.
+- Intercambia dos piezas contiguas para alinear tres o más del mismo tipo.
+- **Los bloques de material no se mueven ni se combinan.** Cuando se despeja el suelo bajo ellos, bajan; al llegar a las dos filas de abajo salen del tablero y los obreros los llevan a la obra. Algunos valen dos bloques (lo indica un «×2»).
+- **Se gana** cuando todos los bloques del tablero han salido y han llegado a la obra. **Se pierde** si se acaban los movimientos (aun así te quedas con la mitad de lo que habías entregado).
+- **Piezas especiales.**
+  - Alinear 4 crea el **sello alado**: limpia su fila y su columna.
+  - Alinear 5 o más crea el **sol radiante**: limpia un cuadrado de 3 × 3.
+  - Intercambiar dos especiales provoca una explosión combinada.
+- **Poderes** de uso limitado por nivel: BOMBA, RAYO, REVOLVER (reorganiza el tablero sin tocar los bloques) y AURORA (quita todas las piezas de un tipo).
+- **Sugerir** marca la jugada que despeja más suelo bajo un bloque.
+- **Estrellas** según los movimientos que sobran: tres con el 40 % o más, dos con el 15 % o más, una en el resto.
+
+## 🏘️ El asentamiento
+
+El menú es tu pueblo. Las maravillas se levantan en el mapa según las completas (la siguiente aparece marcada con una flecha) y los materiales que entregan los obreros se guardan en el almacén de arriba. Con ellos mejoras cinco edificios básicos, cada uno con dos niveles; sus ventajas se aplican **al empezar cada obra**:
+
+| Edificio | Material | Coste (nivel 1 / 2) | Ventaja por nivel |
+|---|---|---|---|
+| Casa de obreros | madera | 5 / 12 | +2 movimientos |
+| Pozo | piedra | 5 / 12 | +1 Revolver |
+| Horno de ladrillos | ladrillo | 5 / 12 | +1 Bomba |
+| Taller de mármol | mármol | 5 / 12 | +1 Rayo |
+| Fundición | bronce | 5 / 12 | +1 Aurora |
+
+Rejugar una maravilla da más materiales. Es una primera versión del equilibrio: los costes y las ventajas se editan en `BUILDINGS` de `js/data.js`.
 
 ### 🏛️ Las maravillas
 
-| # | Maravilla | Época | Dificultad | Etapas | Movimientos |
-|---|---|---|---|---|---|
-| 1 | La Pirámide | 2560 a. C. | Fácil | 9 | 48 |
-| 2 | El Faro | 1952 | Fácil | 9 | 44 |
-| 3 | Los Jardines | 1969 | Media | 12 | 42 |
-| 4 | El Coloso | 1983 | Media | 12 | 40 |
-| 5 | El Templo | 1990 | Difícil | 12 | 38 |
-| 6 | La Estatua | 2001 | Difícil | 14 | 36 |
-| 7 | La Tumba | 2012 | Experta | 15 | 32 |
-| 8 | El Oráculo | 2045 | Experta | 15 | 28 |
+| # | Maravilla | Lugar | Época | Dificultad | Material | Bloques en el tablero | Para construirla | Movimientos |
+|---|---|---|---|---|---|---|---|---|
+| 1 | Gran Pirámide | Guiza, Egipto | c. 2560 a. C. | Fácil | piedra | 8 | 8 | 40 |
+| 2 | Jardines Colgantes | Babilonia | c. 600 a. C. | Fácil | ladrillo | 9 | 9 | 40 |
+| 3 | Estatua de Zeus | Olimpia, Grecia | c. 435 a. C. | Media | mármol | 8 | 10 | 44 |
+| 4 | Templo de Artemisa | Éfeso | c. 550 a. C. | Media | madera | 8 | 11 | 52 |
+| 5 | Mausoleo de Halicarnaso | Halicarnaso | c. 350 a. C. | Difícil | mármol | 8 | 12 | 44 |
+| 6 | Coloso de Rodas | Rodas | c. 280 a. C. | Difícil | bronce | 8 | 13 | 50 |
+| 7 | Faro de Alejandría | Alejandría, Egipto | c. 280 a. C. | Experta | piedra | 8 | 14 | 60 |
+
+Las maravillas se desbloquean en orden: hay que completar la anterior para abrir la siguiente.
 
 ## 🚀 Ejecutar y publicar
 
 ### Jugar en local
 
-No hace falta instalar nada. Abre `index.html` en el navegador.
+No hace falta instalar nada. Abre `index.html` en el navegador, o sirve la carpeta:
 
 ```bash
 git clone https://github.com/Ivanchux/wonder-iv.git
 cd wonder-iv
-# abre index.html, o sirve la carpeta si prefieres:
 python3 -m http.server 8000   # http://localhost:8000
 ```
 
@@ -115,37 +129,46 @@ Al estar en el mismo dominio que RETROTERM.AI, el récord y las estrellas guarda
 ## 🔧 Detalles técnicos
 
 - **HTML, CSS y JavaScript planos.** Los scripts son clásicos (no módulos), se cargan en orden y comparten el ámbito global.
-- **Fichas y gemas en SVG** generadas desde `js/data.js`, donde también se editan los niveles.
-- **Entrada unificada** con *pointer events*: toque sobre dos fichas contiguas o deslizamiento, válidos para ratón, táctil y lápiz.
-- **Fondo de partículas** y arte ASCII animado en canvas y DOM.
-- **Guardado** del récord y las estrellas en `localStorage`, dentro de `try/catch`.
-- **Pruebas:** `tools/bot` ejecuta el código real del motor en Node con un DOM simulado, reloj virtual y semilla fija.
-- **Tipografía:** Cinzel, incluida en `css/fonts/` (licencia SIL OFL 1.1, ver `css/fonts/OFL.txt`). Ya no hay peticiones a terceros.
-- **Aspecto:** `css/antiguo.css` se carga después de `css/wonder.css` y solo cambia el aspecto; las piezas y el paisaje son SVG propios (`js/data.js` e `index.html`).
+- **Arte:** piezas, bloques, marco, columnas, fondos de las siete obras y operarios son ilustraciones en `img/`; el mapa del asentamiento, los edificios y las siete maravillas se dibujan en SVG desde el código (`js/asentamiento.js`, `js/maravillas.js`). Más detalles en [`docs/ARTE.md`](docs/ARTE.md).
+- **Operarios** animados con hojas de 8 fotogramas (`img/obreros/`) y `steps()` de CSS; con `prefers-reduced-motion` se quedan quietos y las entregas son instantáneas.
+- **Entrada unificada** con *pointer events*: toque sobre dos piezas contiguas o deslizamiento, válidos para ratón, táctil y lápiz.
+- **Guardado** en `localStorage` dentro de `try/catch`: récord y estrellas (`wonder_best_*`, `wonder_stars_*`), materiales (`wonder_stock`) y edificios (`wonder_build`).
+- **Las tareas pendientes de una obra se descartan** al cambiar de nivel o reiniciar, para que una entrega o un aviso de victoria antiguos no caigan sobre la partida nueva.
+- **Tipografía:** Cinzel, incluida en `css/fonts/` (licencia SIL OFL 1.1, ver `css/fonts/OFL.txt`).
+- **Pruebas:** `node tools/prueba/jugar.mjs` (necesita Playwright) comprueba el asentamiento, las ventajas, el guardado y que un bot completa los siete niveles.
+- **Regenerar el arte:** `tools/build-sprites.py` y `tools/build-art.py` convierten las hojas sobre fondo verde en PNG con transparencia (necesitan Python con Pillow y NumPy).
 - No tiene sonido ni controles de teclado.
 
 ## 📁 Estructura del repositorio
 
 ```text
 wonder-iv/
-├── index.html        # Marcado de las pantallas (menú, partida, avisos de era, pantalla final)
-├── css/wonder.css    # Estilos base y maquetación
-├── css/antiguo.css   # Tema de maravillas antiguas (colores, marcos, tipografía)
-├── css/fonts/        # Cinzel (OFL)
+├── index.html          # Marcado de las pantallas (asentamiento, partida, pantalla final)
+├── css/
+│   ├── wonder.css      # Estilos base
+│   ├── antiguo.css     # Tema de maravillas antiguas
+│   ├── nivel.css       # Pantalla de partida: fondo, tablero, marcadores, obreros
+│   ├── asentamiento.css# Menú: mapa, almacén y panel de edificios
+│   └── fonts/          # Cinzel (OFL)
 ├── js/
-│   ├── data.js       # Fichas, gemas en SVG y las maravillas con sus eras  ← los niveles se editan aquí
-│   ├── storage.js    # Récords y estrellas en localStorage
-│   ├── state.js      # Estado global de la partida
-│   ├── screens.js    # Cambio de pantalla y menú de selección
-│   ├── fx.js         # Partículas, fondo de la escena y arte ASCII
-│   ├── engine.js     # Tablero, entrada, intercambios, combinaciones, gemas, gravedad y pistas
-│   ├── powerups.js   # Poderes especiales
-│   ├── hud.js        # Marcadores, puntuación flotante, pantallas finales y registro
-│   └── main.js       # Arranque y botón de modo claro/oscuro
-├── tools/bot/        # Bot y arnés de pruebas en Node
-├── docs/             # Banner, capturas y GIFs de este README
-├── CHANGELOG.md      # Historial de versiones
-├── LICENSE           # PolyForm Noncommercial 1.0.0
+│   ├── data.js         # Piezas, materiales, edificios y las siete maravillas  ← los niveles se editan aquí
+│   ├── maravillas.js   # Las maravillas en SVG y el montón de bloques entregados
+│   ├── asentamiento.js # Mapa del asentamiento, edificios en SVG y panel de mejoras
+│   ├── storage.js      # Récords, estrellas, materiales y edificios en localStorage
+│   ├── state.js        # Estado global de la partida
+│   ├── screens.js      # Cambio de pantalla
+│   ├── rocas.js        # Bloques del tablero, salida y obreros
+│   ├── engine.js       # Tablero, entrada, combinaciones, gemas, gravedad y pistas
+│   ├── powerups.js     # Poderes
+│   ├── hud.js          # Marcadores, pantalla final y registro
+│   ├── sprites.js      # (generado) medidas de las hojas de operarios
+│   ├── arte.js         # (generado) medidas del marco del tablero
+│   └── main.js         # Arranque y botón de modo claro/oscuro
+├── img/                # piezas, bloques, marco, columna, fondos y obreros
+├── tools/              # prueba/jugar.mjs, build-sprites.py, build-art.py
+├── docs/               # Banner, capturas, GIFs, ARTE.md y los prompts de las imágenes
+├── CHANGELOG.md
+├── LICENSE             # PolyForm Noncommercial 1.0.0
 └── README.md
 ```
 
@@ -154,6 +177,8 @@ wonder-iv/
 - [ ] Sonido y silencio
 - [ ] Controles de teclado
 - [ ] Pausa al cambiar de pestaña
+- [ ] Ilustraciones propias para los edificios y el mapa (los prompts están en `docs/PROMPTS_ASENTAMIENTO.md`)
+- [ ] Equilibrar movimientos y costes con partidas de personas reales
 - [ ] Textos en inglés
 
 ## 📜 Licencia

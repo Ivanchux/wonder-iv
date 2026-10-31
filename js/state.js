@@ -14,6 +14,7 @@ let rocksLeft=0;          // rocas que quedan por romper
 let pendingDeliveries=0;  // bloques en camino al solar
 let deliveredIdx=0;       // siguiente etapa que se va a colocar en el solar
 let matsGot={};           // materiales recogidos en este nivel
+let runId=0;              // cambia en cada startLevel: las tareas pendientes de una obra anterior se abandonan
 const scoreBonus=1;
 
 // Poderes

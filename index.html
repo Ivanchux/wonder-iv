@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="css/wonder.css">
 <link rel="stylesheet" href="css/antiguo.css">
 <link rel="stylesheet" href="css/nivel.css">
+<link rel="stylesheet" href="css/asentamiento.css">
 </head>
 <body>
 
@@ -54,28 +55,14 @@
   <button class="rt-theme-btn" id="btn-theme" title="Cambiar tema" aria-label="Cambiar tema">◑</button>
 </nav>
 
-<!-- ══ LEVEL SELECT ══ -->
+<!-- ══ ASENTAMIENTO (menú) ══ -->
 <div id="screen-select" class="screen active">
-  <div class="sel-header">
-    <div class="sel-eyebrow">◆ SIETE MARAVILLAS DEL MUNDO DIGITAL ◆</div>
-    <div class="sel-ornament">
-      <div class="sel-ornament-line"></div>
-      <span class="sel-ornament-diamond">◈</span>
-      <div class="sel-ornament-line"></div>
-    </div>
-    <div class="sel-title">WONDER IV</div>
-    <div class="sel-ornament">
-      <div class="sel-ornament-line"></div>
-      <span class="sel-ornament-diamond">◈</span>
-      <div class="sel-ornament-line"></div>
-    </div>
-    <div class="sel-sub">ARQUEOLOGÍA DIGITAL — ELIGE TU MARAVILLA</div>
-  </div>
-  <div class="sel-grid" id="sel-grid"></div>
-  <div class="sel-footer">◆ SELECCIONA UNA MARAVILLA PARA INICIAR LA EXPEDICIÓN ◆</div>
-  <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;letter-spacing:0.15em;color:#2a1e08;margin-top:10px;padding-bottom:20px;">
-    <a href="https://ivanchux.github.io/Retroterm-AI/" style="color:#4a3010;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#ffaa00'" onmouseout="this.style.color='#4a3010'">⬅ RETROTERM.AI HUB</a>
-  </div>
+  <header class="set-head">
+    <div class="set-titles"><div class="set-title">WONDER IV</div><div class="set-sub">TU ASENTAMIENTO · ELIGE UNA OBRA</div></div>
+    <div class="set-stock" id="set-stock" aria-label="Materiales"></div>
+  </header>
+  <div class="set-scroll"><div class="set-map" id="set-map"></div></div>
+  <div class="set-panel" id="set-panel" role="dialog" aria-live="polite"></div>
 </div>
 
 <!-- ══ GAME ══ -->
@@ -154,7 +141,7 @@
 <script src="js/storage.js"></script>
 <script src="js/state.js"></script>
 <script src="js/screens.js"></script>
-<script src="js/fx.js"></script>
+<script src="js/asentamiento.js"></script>
 <script src="js/sprites.js"></script>
 <script src="js/arte.js"></script>
 <script src="js/rocas.js"></script>

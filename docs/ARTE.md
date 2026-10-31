@@ -10,6 +10,8 @@
 | Fondos de las siete obras | `img/fondos/` | Ilustraciones generadas con ChatGPT con prompts propios (plantilla de fondo de nivel) |
 | Operarios (4 personajes) | `img/obreros/` | Hojas de 8 fotogramas generadas con los prompts de [`PROMPTS_OBREROS.md`](PROMPTS_OBREROS.md) |
 | Mapa del asentamiento, edificios, las siete maravillas | `js/asentamiento.js`, `js/maravillas.js` | SVG dibujado a mano en el código |
+| Icono y favicons | `icon-512.png`, `apple-touch-icon.png`, `favicon-*.png`, `favicon.ico` | Pieza del sol sobre lapislázuli, con `tools/build-icons.py` |
+| Música y sonidos | `js/audio.js` | Sintetizados en el navegador con Web Audio, sin archivos |
 | Tipografía Cinzel | `css/fonts/` | SIL OFL 1.1 |
 
 Las hojas y las imágenes sueltas llegaron sobre un fondo verde liso `#00FF00`. `tools/build-sprites.py` y `tools/build-art.py` quitan el verde, recortan, reducen y dejan el PNG con transparencia; así se pueden rehacer si se cambia una imagen.

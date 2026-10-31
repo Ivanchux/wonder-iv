@@ -1,5 +1,15 @@
 # Registro de cambios
 
+## 1.4 · Pulido: sonido, música y efectos
+- **Sonido y música propios**, sintetizados con Web Audio (sin archivos de audio): ocho pistas (pueblo y una por maravilla, cada una con su escala, tempo e instrumentos) y unos treinta efectos. La música cambia al entrar y salir de una obra, baja con los jingles de victoria y derrota y se pausa al cambiar de pestaña.
+- **Ajustes** (⚙ o `Esc`): volumen y silencio de música y efectos, «reducir movimiento», ayuda y borrar progreso. Atajos `M`, `F`, `H` y `Esc`.
+- **Efectos y reacciones:** chispas y ondas al combinar y al usar poderes, sacudida de pantalla, confeti al ganar, mensajes de combo (¡BIEN!, ¡GENIAL!, ¡INCREÍBLE!, ¡LEGENDARIO!) y obreros que saltan y comentan.
+- **Interfaz:** barra superior propia con botones de música, efectos, pantalla completa y ajustes; iconos de poderes dibujados (ya no son emojis) con ayuda al pasar el ratón; aviso de inicio de obra; pistas la primera vez; la pantalla final enseña los materiales con icono, avisa de qué edificios puedes mejorar y cabe en pantallas bajas.
+- **Asentamiento con vida:** nubes y pájaros, humo en el horno y la fundición, río con brillo, aldeanos paseando por el camino, banderas y destellos en las obras terminadas, atardecer y noche según la hora, contador de obras y estrellas y rebote al mejorar un edificio.
+- **Icono y favicons nuevos** a partir de la pieza del sol (`tools/build-icons.py`).
+- **Sin vínculo con RETROTERM.AI:** fuera el enlace y la barra de navegación del hub y el modo claro heredado.
+- La prueba automática ahora también comprueba que todas las pistas y efectos suenan, los ajustes y los poderes.
+
 ## 1.3 · El asentamiento
 - **El menú es tu pueblo.** Las siete maravillas se levantan en el mapa según las completas, con estrellas, candado y una flecha en la siguiente. Los materiales que entregan los obreros van al almacén (`wonder_stock`).
 - **Cinco edificios** (casa de obreros, pozo, horno de ladrillos, taller de mármol y fundición), cada uno con dos niveles: se mejoran con su material y dan una ventaja al empezar cada obra (+2 movimientos, +1 Revolver, +1 Bomba, +1 Rayo, +1 Aurora por nivel). Se guardan en `wonder_build`.

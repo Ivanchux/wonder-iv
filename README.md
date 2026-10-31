@@ -30,8 +30,9 @@ Wonder IV es un juego de navegador de combinar tres, ambientado en las obras de 
 - **Sin librerías, sin instalación y sin paso de compilación**: HTML, CSS y JavaScript planos.
 - **Un asentamiento propio** que mejoras con los materiales que recoges.
 - El **récord, las estrellas, los materiales y los edificios** se guardan en el navegador.
-- Sin peticiones a terceros: tipografía, imágenes y sprites van en el repositorio.
-- Nació dentro de [RETROTERM.AI](https://ivanchux.github.io/Retroterm-AI/) y ahora vive en su propio repositorio.
+- **Música y sonidos propios**, generados en el navegador: una pista para el pueblo y otra distinta para cada maravilla.
+- Reacciones y efectos: chispas, ondas, confeti, mensajes de combo y obreros que celebran.
+- Sin peticiones a terceros: tipografía, imágenes, sprites y sonido van con el juego.
 
 ## 📸 Capturas
 
@@ -76,6 +77,16 @@ Wonder IV es un juego de navegador de combinar tres, ambientado en las obras de 
 - **Poderes** de uso limitado por nivel: BOMBA, RAYO, REVOLVER (reorganiza el tablero sin tocar los bloques) y AURORA (quita todas las piezas de un tipo).
 - **Sugerir** marca la jugada que despeja más suelo bajo un bloque.
 - **Estrellas** según los movimientos que sobran: tres con el 40 % o más, dos con el 15 % o más, una en el resto.
+
+## 🔊 Sonido, música y ajustes
+
+Todo el sonido se **sintetiza con Web Audio en el navegador**: no hay archivos de audio ni peticiones externas.
+
+- **Música generativa.** Ocho pistas con carácter propio: una tranquila para el pueblo y una por maravilla, cada una con su escala (frigia dominante en la Pirámide, hijaz en los Jardines, dórica en Zeus, mixolidia en Artemisa, eolia en el Mausoleo, jónica en el Coloso y lidia en el Faro), su tempo y sus instrumentos (flauta, arpa, pads, tambor de marco, timbales). La melodía se inventa compás a compás, así que nunca suena exactamente igual.
+- **Efectos:** intercambio, trío (con notas que suben con el combo), piezas especiales, bloques que caen y salen, obreros que cogen y colocan, poderes, victoria, derrota y mejora de edificios.
+- **Ajustes** (⚙ o `Esc`): volumen y silencio de música y efectos por separado, «reducir movimiento», ayuda y borrar progreso. También respeta `prefers-reduced-motion`.
+- **Atajos:** `M` música · `F` pantalla completa · `H` pista · `Esc` ajustes.
+- El sonido empieza con el primer toque (los navegadores no permiten audio antes) y se pausa al cambiar de pestaña.
 
 ## 🏘️ El asentamiento
 
@@ -124,20 +135,19 @@ python3 -m http.server 8000   # http://localhost:8000
 3. En *Build and deployment* elige **Deploy from a branch**, rama `main` y carpeta `/ (root)`.
 4. En un minuto estará en `https://ivanchux.github.io/wonder-iv/`.
 
-Al estar en el mismo dominio que RETROTERM.AI, el récord y las estrellas guardados desde el hub se conservan.
-
 ## 🔧 Detalles técnicos
 
 - **HTML, CSS y JavaScript planos.** Los scripts son clásicos (no módulos), se cargan en orden y comparten el ámbito global.
-- **Arte:** piezas, bloques, marco, columnas, fondos de las siete obras y operarios son ilustraciones en `img/`; el mapa del asentamiento, los edificios y las siete maravillas se dibujan en SVG desde el código (`js/asentamiento.js`, `js/maravillas.js`). Más detalles en [`docs/ARTE.md`](docs/ARTE.md).
+- **Arte:** piezas, bloques, marco, columnas, fondos de las siete obras y operarios son ilustraciones en `img/`; los edificios del asentamiento (niveles 1 y 2) son ilustraciones en `img/edificios/`; el mapa, los solares vacíos y las siete maravillas se dibujan en SVG desde el código (`js/asentamiento.js`, `js/maravillas.js`). Más detalles en [`docs/ARTE.md`](docs/ARTE.md).
 - **Operarios** animados con hojas de 8 fotogramas (`img/obreros/`) y `steps()` de CSS; con `prefers-reduced-motion` se quedan quietos y las entregas son instantáneas.
 - **Entrada unificada** con *pointer events*: toque sobre dos piezas contiguas o deslizamiento, válidos para ratón, táctil y lápiz.
-- **Guardado** en `localStorage` dentro de `try/catch`: récord y estrellas (`wonder_best_*`, `wonder_stars_*`), materiales (`wonder_stock`) y edificios (`wonder_build`).
+- **Guardado** en `localStorage` dentro de `try/catch`: récord y estrellas (`wonder_best_*`, `wonder_stars_*`), materiales (`wonder_stock`), edificios (`wonder_build`), sonido (`wonder_audio`) y ajustes (`wonder_reduce`, `wonder_tuto`).
+- **Efectos:** partículas en un canvas único (`js/efectos.js`) que solo se anima mientras hay algo que dibujar.
 - **Las tareas pendientes de una obra se descartan** al cambiar de nivel o reiniciar, para que una entrega o un aviso de victoria antiguos no caigan sobre la partida nueva.
 - **Tipografía:** Cinzel, incluida en `css/fonts/` (licencia SIL OFL 1.1, ver `css/fonts/OFL.txt`).
-- **Pruebas:** `node tools/prueba/jugar.mjs` (necesita Playwright) comprueba el asentamiento, las ventajas, el guardado y que un bot completa los siete niveles.
-- **Regenerar el arte:** `tools/build-sprites.py` y `tools/build-art.py` convierten las hojas sobre fondo verde en PNG con transparencia (necesitan Python con Pillow y NumPy).
-- No tiene sonido ni controles de teclado.
+- **Pruebas:** `node tools/prueba/jugar.mjs` (necesita Playwright) comprueba el asentamiento, las ventajas, el guardado, que cada pista y cada efecto de sonido suenan sin saturar, los ajustes, los poderes y que un bot completa los siete niveles.
+- **Regenerar el arte:** `tools/build-sprites.py` y `tools/build-art.py` convierten las hojas sobre fondo verde en PNG con transparencia, y `tools/build-icons.py` rehace el icono y los favicons (necesitan Python con Pillow y NumPy).
+- No se puede jugar solo con teclado (los atajos son para música, pantalla completa, pista y ajustes).
 
 ## 📁 Estructura del repositorio
 
@@ -148,12 +158,16 @@ wonder-iv/
 │   ├── wonder.css      # Estilos base
 │   ├── antiguo.css     # Tema de maravillas antiguas
 │   ├── nivel.css       # Pantalla de partida: fondo, tablero, marcadores, obreros
-│   ├── asentamiento.css# Menú: mapa, almacén y panel de edificios
+│   ├── asentamiento.css# Menú: mapa, almacén y panel de edificios, animaciones del pueblo
+│   ├── interfaz.css    # Barra superior, ajustes, mensajes, globitos y efectos
 │   └── fonts/          # Cinzel (OFL)
 ├── js/
 │   ├── data.js         # Piezas, materiales, edificios y las siete maravillas  ← los niveles se editan aquí
 │   ├── maravillas.js   # Las maravillas en SVG y el montón de bloques entregados
 │   ├── asentamiento.js # Mapa del asentamiento, edificios en SVG y panel de mejoras
+│   ├── audio.js        # Efectos y música generados con Web Audio
+│   ├── efectos.js      # Partículas, ondas, confeti, mensajes de combo y reacciones de los obreros
+│   ├── interfaz.js     # Barra superior, ajustes, ayuda, atajos y aviso de inicio de obra
 │   ├── storage.js      # Récords, estrellas, materiales y edificios en localStorage
 │   ├── state.js        # Estado global de la partida
 │   ├── screens.js      # Cambio de pantalla
@@ -164,8 +178,8 @@ wonder-iv/
 │   ├── sprites.js      # (generado) medidas de las hojas de operarios
 │   ├── arte.js         # (generado) medidas del marco del tablero
 │   └── main.js         # Arranque y botón de modo claro/oscuro
-├── img/                # piezas, bloques, marco, columna, fondos y obreros
-├── tools/              # prueba/jugar.mjs, build-sprites.py, build-art.py
+├── img/                # piezas, bloques, edificios, marco, columna, fondos y obreros
+├── tools/              # prueba/jugar.mjs, build-sprites.py, build-art.py, build-icons.py
 ├── docs/               # Banner, capturas, GIFs, ARTE.md y los prompts de las imágenes
 ├── CHANGELOG.md
 ├── LICENSE             # PolyForm Noncommercial 1.0.0
@@ -174,10 +188,9 @@ wonder-iv/
 
 ## 🗺️ Ideas futuras
 
-- [ ] Sonido y silencio
-- [ ] Controles de teclado
-- [ ] Pausa al cambiar de pestaña
-- [ ] Ilustraciones propias para los edificios y el mapa (los prompts están en `docs/PROMPTS_ASENTAMIENTO.md`)
+- [ ] Jugar solo con teclado
+- [ ] Más pistas de música y una voz de cantero para las reacciones
+- [ ] Ilustración propia para el mapa del asentamiento, el solar vacío y el título (los prompts están en `docs/PROMPTS_ASENTAMIENTO.md`)
 - [ ] Equilibrar movimientos y costes con partidas de personas reales
 - [ ] Textos en inglés
 

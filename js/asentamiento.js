@@ -11,7 +11,7 @@ const bR=(x,y,w,h,f,rx=2,s=DK)=>`<rect x="${x}" y="${y}" width="${w}" height="${
 const bP=(pts,f)=>`<polygon points="${pts}" fill="${f}" stroke="${DK}" stroke-width="2" stroke-linejoin="round"/>`;
 const bE=(cx,cy,rx,ry,f,s=DK)=>`<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${f}" stroke="${s}" stroke-width="2"/>`;
 const SHADOW='<ellipse cx="100" cy="134" rx="86" ry="9" fill="#000" opacity=".25"/>';
-const smoke=(x,y)=>`<g fill="#e8e4dc" opacity=".8"><circle cx="${x}" cy="${y}" r="6"/><circle cx="${x+5}" cy="${y-12}" r="8"/><circle cx="${x+2}" cy="${y-28}" r="10" opacity=".6"/></g>`;
+const smoke=(x,y)=>`<g class="smk" fill="#e8e4dc">${[0,1,2].map(i=>`<circle style="--i:${i}" cx="${x+i*2}" cy="${y-i*3}" r="${6+i*2}"/>`).join('')}</g>`;
 function buildingArt(id,lv){
   if(lv===0) return `<g opacity=".9">${SHADOW}<path d="M34 128H166L156 84H44Z" fill="rgba(255,246,214,.25)" stroke="#6a5030" stroke-width="2" stroke-dasharray="7 5"/>${bR(50,114,22,14,STN)}${bR(84,118,26,12,STN_D)}${bR(124,112,20,16,STN)}${bR(70,100,16,10,STN)}</g>`;
   const two=lv>=2;
@@ -43,7 +43,8 @@ function settlementSVG(){
   const nextIdx=WONDERS.findIndex((w,i)=>getBestStars(i)===0 && (i===0||getBestStars(i-1)>0));
   let s=`<svg id="set-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Tu asentamiento">`;
   s+=`<rect width="1600" height="900" fill="url(#sc-sky)"/><rect width="1600" height="900" fill="url(#sc-sun)"/>`;
-  s+=`<g fill="#fff" opacity=".9"><ellipse cx="260" cy="110" rx="120" ry="24"/><ellipse cx="330" cy="92" rx="80" ry="24"/><ellipse cx="1220" cy="90" rx="140" ry="22"/><ellipse cx="1290" cy="72" rx="80" ry="22"/><ellipse cx="760" cy="150" rx="100" ry="18"/></g>`;
+  [[260,110,120,0,'-10s',110],[1220,90,140,0,'-60s',140],[760,150,100,0,'-35s',95]].forEach(([x,y,rx,_,dl,du])=>{ s+=`<g class="cloud" style="animation-duration:${du}s;animation-delay:${dl}"><g fill="#fff" opacity=".9"><ellipse cx="${x}" cy="${y}" rx="${rx}" ry="24"/><ellipse cx="${x+60}" cy="${y-18}" rx="${rx*.65}" ry="22"/></g></g>`; });
+  [[120,'0s',46],[260,'-18s',58]].forEach(([y,dl,du])=>{ s+=`<g class="bird" style="--y:${y}px;animation-duration:${du}s;animation-delay:${dl}"><path class="flap" d="M0 0Q7-9 14 0Q21-9 28 0" fill="none" stroke="#24385a" stroke-width="2.4" stroke-linecap="round"/></g>`; });
   s+=`<path d="M0 270Q160 190 330 250T640 230T980 262T1320 214T1600 250V900H0Z" fill="#9ab8c8" opacity=".6"/>`;
   s+=`<path d="M0 330Q200 262 430 318T880 300T1300 322T1600 290V900H0Z" fill="url(#sc-hill1)"/>`;
   s+=`<path d="M0 440Q260 392 560 436T1100 424T1600 440V900H0Z" fill="url(#sc-hill2)"/>`;
@@ -51,19 +52,23 @@ function settlementSVG(){
   // camino de tierra
   s+=`<path d="M-20 596Q220 560 460 588T940 584T1360 590T1620 574V604Q1360 624 940 612T460 618T-20 624Z" fill="#c8a66a" stroke="#8a6a3a" stroke-width="2"/>`;
   // río con dos puentes
-  s+=`<path d="M-20 650Q260 626 560 654T1100 646T1620 654V690Q1340 704 1060 690T520 694T-20 688Z" fill="#4a90c8" stroke="#2a5a88" stroke-width="2"/><path d="M80 664Q300 650 520 668M700 668Q900 654 1120 668M1240 668Q1400 660 1580 668" stroke="#a8d8f0" stroke-width="3" fill="none" opacity=".7"/>`;
+  s+=`<path d="M-20 650Q260 626 560 654T1100 646T1620 654V690Q1340 704 1060 690T520 694T-20 688Z" fill="#4a90c8" stroke="#2a5a88" stroke-width="2"/><path class="shim" d="M80 664Q300 650 520 668M700 668Q900 654 1120 668M1240 668Q1400 660 1580 668" stroke="#d8f0ff" stroke-width="3" fill="none" stroke-dasharray="46 30" opacity=".8"/>`;
   [[300,632],[1000,628]].forEach(([x,y])=>{ s+=`<g><rect x="${x}" y="${y}" width="70" height="72" fill="#b08850" stroke="#5a3a18" stroke-width="2"/><path d="M${x} ${y+8}H${x+70}M${x} ${y+24}H${x+70}M${x} ${y+40}H${x+70}M${x} ${y+56}H${x+70}" stroke="#7a5428" stroke-width="2"/></g>`; });
   s+=`</g><path d="M0 668Q400 654 800 670T1600 664V900H0Z" fill="#5e9a48"/>`;
   [[14,560,'c'],[1578,552,'c'],[236,640,'o'],[1175,648,'p'],[1480,640,'o'],[20,780,'o'],[1560,800,'p'],[640,640,'c'],[1380,650,'c']].forEach(([x,y,k])=>{ s+=tree(x,y,k); });
+  // aldeanos que pasean por el camino
+  [['b_walk',60,1500,562,70,0,52],['c_walk',1480,120,572,84,-30,52],['d_walk',300,1200,566,60,-12,50]].forEach(([k,x0,x1,y,du,dl,H])=>{ if(typeof SPRITES==='undefined'||!SPRITES[k]) return; const sp=SPRITES[k], w=Math.round(sp.w*H/sp.h);
+    s+=`<g class="walker" style="--x0:${x0}px;--x1:${x1}px;--y:${y}px;animation-duration:${du}s;animation-delay:${dl}s"><svg x="${-w/2}" y="${-H}" width="${w}" height="${H}" viewBox="0 0 ${w} ${H}" overflow="hidden"><image class="sprs" href="img/obreros/${k}.png" width="${w*sp.n}" height="${H}" style="--end:${-w*sp.n}px"/></svg></g>`; });
   // maravillas
   WONDERS.forEach((w,i)=>{
     const [x,y]=WONDER_SPOTS[i], stars=getBestStars(i), locked=i>0&&getBestStars(i-1)===0, done=stars>0, next=i===nextIdx;
     const cls='plot wonder-plot'+(locked?' locked':'')+(done?' done':'')+(next?' next':'');
-    s+=`<g class="${cls}" data-kind="wonder" data-i="${i}" tabindex="${locked?-1:0}" role="button" aria-label="${w.name}${locked?' (bloqueada)':''}">`;
+    s+=`<g class="${cls}" data-kind="wonder" data-i="${i}" tabindex="${locked?-1:0}" role="button" aria-label="${w.name}${locked?' (bloqueada)':''}"><title>${w.name}${locked?' (bloqueada)':done?' — completada':''}</title>`;
     s+=`<ellipse cx="${x+WS_W/2}" cy="${y+WS_H-4}" rx="${WS_W*.46}" ry="10" fill="#6a4a20" opacity=".35"/>`;
     s+=`<g class="w-art">${nestedSVG(wonderSceneSVG(w.id,done?w.stages:0,{ground:false}),x,y,WS_W,WS_H)}</g>`;
     s+=`<g transform="translate(${x+WS_W/2} ${y+WS_H+14})"><rect x="-96" y="-2" width="192" height="26" rx="8" fill="#f2e4b8" stroke="#6a4a1c" stroke-width="2"/><text y="16" text-anchor="middle" font-family="Cinzel,Georgia,serif" font-weight="700" font-size="13" fill="#2a1604" letter-spacing="1"${w.name.length>20?' textLength="176" lengthAdjust="spacingAndGlyphs"':''}>${w.name}</text>`;
     s+=`<text y="42" text-anchor="middle" font-size="18" fill="${done?'#e0a020':'#6a5a3a'}" stroke="#2a1604" stroke-width=".6">${[0,1,2].map(k=>k<stars?'★':'☆').join(' ')}</text></g>`;
+    if(done) s+=`<g transform="translate(${x+WS_W-26} ${y+4})"><path d="M0 0V40" stroke="#5a3a18" stroke-width="3"/><path class="flag" d="M1.5 2H26L19 9L26 16H1.5Z" fill="#c8402a" stroke="#6a1a10" stroke-width="1.5"/></g><g class="glint" transform="translate(${x+WS_W/2} ${y+WS_H*.45})"><path d="M0 -12L3 -3L12 0L3 3L0 12L-3 3L-12 0L-3 -3Z" fill="#fff6c0"/></g>`;
     if(locked) s+=`<g transform="translate(${x+WS_W/2} ${y+WS_H/2})"><circle r="22" fill="#2a1604" opacity=".75"/><rect x="-10" y="-4" width="20" height="16" rx="2" fill="#e0c070"/><path d="M-6 -4V-10Q-6 -18 0 -18Q6 -18 6 -10V-4" fill="none" stroke="#e0c070" stroke-width="3"/></g>`;
     if(next) s+=`<g transform="translate(${x+WS_W/2} ${y-2})"><g class="pulse"><path d="M-14 -22H14L0 0Z" fill="#f2d27a" stroke="#6a4a1c" stroke-width="2"/></g></g>`;
     s+=`</g>`;
@@ -71,13 +76,20 @@ function settlementSVG(){
   // edificios
   BUILDINGS.forEach((b,i)=>{
     const [x,y]=BUILD_SPOTS[i], lv=buildingLevel(b.id), can=lv<BUILD_MAX && (getStock()[b.mat]||0)>=b.cost[lv];
-    s+=`<g class="plot build-plot${can?' can':''}" data-kind="build" data-id="${b.id}" tabindex="0" role="button" aria-label="${b.name}, nivel ${lv}">`;
-    s+=`<g class="w-art">${nestedSVG(`<svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">${buildingArt(b.id,lv)}</svg>`,x,y,BS_W,BS_H)}</g>`;
+    s+=`<g class="plot build-plot${can?' can':''}" data-kind="build" data-id="${b.id}" tabindex="0" role="button" aria-label="${b.name}, nivel ${lv}"><title>${b.name} · nivel ${lv}/${BUILD_MAX}</title>`;
+    // nivel 1 y 2: ilustraciones de img/edificios; nivel 0: el solar dibujado en SVG
+    const art=lv>=1
+      ? nestedSVG(`<svg viewBox="-10 -40 220 190" xmlns="http://www.w3.org/2000/svg">${SHADOW}<image href="img/edificios/edif_${b.id}_${lv}.png" x="-10" y="-40" width="220" height="190" preserveAspectRatio="xMidYMax meet"/></svg>`,x-5,y-34,BS_W+10,BS_H+36)
+      : nestedSVG(`<svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">${buildingArt(b.id,0)}</svg>`,x,y,BS_W,BS_H);
+    s+=`<g class="w-art">${art}</g>`;
     s+=`<g transform="translate(${x+BS_W/2} ${y+BS_H+8})"><rect x="-98" y="-2" width="196" height="26" rx="8" fill="#f2e4b8" stroke="#6a4a1c" stroke-width="2"/><text y="16" text-anchor="middle" font-family="Cinzel,Georgia,serif" font-weight="700" font-size="12" fill="#2a1604" letter-spacing=".5">${b.name}</text>`;
     s+=`<text y="42" text-anchor="middle" font-family="Cinzel,Georgia,serif" font-size="13" font-weight="700" fill="#fff6d8" stroke="#2a1604" stroke-width="3" paint-order="stroke">NIVEL ${lv} / ${BUILD_MAX}</text></g>`;
     if(can) s+=`<g transform="translate(${x+BS_W-14} ${y+6})"><g class="pulse"><circle r="15" fill="#f2d27a" stroke="#6a4a1c" stroke-width="2"/><path d="M0 8V-8M-7 -1L0 -8L7 -1" stroke="#2a1604" stroke-width="3" fill="none" stroke-linecap="round"/></g></g>`;
     s+=`</g>`;
   });
+  const hr=new Date().getHours();
+  if(hr>=19&&hr<21) s+=`<rect width="1600" height="900" fill="#ff8a30" opacity=".16" pointer-events="none"/>`;
+  else if(hr>=21||hr<6){ s+=`<rect width="1600" height="900" fill="#0a1440" opacity=".42" pointer-events="none"/>`; for(let i=0;i<40;i++) s+=`<circle class="star" style="animation-delay:${(i*.37)%3}s" cx="${(i*397)%1600}" cy="${30+(i*151)%260}" r="${1+(i%3)*.6}" fill="#fff6d8"/>`; }
   return s+`</svg>`;
 }
 
@@ -90,6 +102,7 @@ function renderSettlement(){
   const map=document.getElementById('set-map'); if(!map) return;
   map.innerHTML=settlementSVG();
   document.getElementById('set-stock').innerHTML=stockBarHTML();
+  { const done=WONDERS.filter((w,i)=>getBestStars(i)>0).length, stars=WONDERS.reduce((a,w,i)=>a+getBestStars(i),0); const e=document.getElementById('set-prog'); if(e) e.textContent=`OBRAS ${done}/${WONDERS.length} · ★ ${stars}/${WONDERS.length*3}`; }
 }
 function closePanel(){ const p=document.getElementById('set-panel'); if(p){ p.classList.remove('show'); p.innerHTML=''; } }
 function openPanel(html){ const p=document.getElementById('set-panel'); p.innerHTML=`<button class="sp-x" onclick="closePanel()" aria-label="Cerrar">✕</button>${html}`; p.classList.add('show'); }
@@ -111,7 +124,8 @@ function showBuildPanel(id){
   ${last?'<div class="sp-max">★ NIVEL MÁXIMO ★</div>':`<button class="btn btn-hint" ${have>=b.cost[lv]?'':'disabled'} onclick="doUpgrade('${id}')">${lv?'▲ MEJORAR':'▲ CONSTRUIR'}</button>`}
   ${last||have>=b.cost[lv]?'':`<p class="sp-hint">Entrega bloques de ${MATERIALS[b.mat].name.toLowerCase()} en las obras para conseguirlo.</p>`}`);
 }
-function doUpgrade(id){ if(upgradeBuilding(id)){ renderSettlement(); showBuildPanel(id); } }
+function doUpgrade(id){ if(upgradeBuilding(id)){ Snd.play('upgrade'); renderSettlement(); showBuildPanel(id);
+  const g=document.querySelector(`[data-kind="build"][data-id="${id}"]`); if(g){ g.classList.add('up'); setTimeout(()=>g.classList.remove('up'),900); const b=g.getBoundingClientRect(); FX.burst(b.left+b.width/2,b.top+b.height*.55,['#f2d27a','#fff6d8','#e8a850'],26,{max:260}); FX.ring(b.left+b.width/2,b.top+b.height*.6,'#f2d27a',110); } } }
 
 (function bindSettlement(){
   const map=document.getElementById('set-map'); if(!map) return;

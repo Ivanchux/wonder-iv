@@ -663,72 +663,8 @@ html, body {
 .era-bonus-title { font-family: var(--font-cin); font-size: 7px; letter-spacing: 2px; color: #4a3010; }
 .era-bonus-val { font-family: var(--font-cin); font-size: 13px; color: var(--c-amber); text-shadow: 0 0 8px #ffaa0055; }
 .btn-era-cont { display: none; }
-/* ── RETROTERM NAV ── */
-.rt-nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 950;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 7px 16px;
-  background: rgba(5, 8, 10, 0.88);
-  border-bottom: 1px solid #2a1e08;
-  backdrop-filter: blur(6px);
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.58rem;
-  letter-spacing: 0.18em;
-}
-.rt-nav a {
-  color: #6a4010;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-.rt-nav a:hover { color: #ffaa00; }
-.rt-nav .rt-sep { color: #2a1e08; margin: 0 4px; }
-.rt-nav .rt-cur { color: #ffaa0088; }
-.rt-spacer { flex: 1; }
-.rt-theme-btn {
-  background: transparent;
-  border: 1px solid #2a1e08;
-  color: #6a4010;
-  font-size: 0.8rem;
-  width: 24px; height: 24px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: color 0.2s, border-color 0.2s;
-  font-family: inherit;
-  padding: 0;
-}
-.rt-theme-btn:hover { color: #ffaa00; border-color: #ffaa0066; }
-.rt-acceso {
-  color: #6a4010;
-  text-decoration: none;
-  border: 1px solid #2a1e08;
-  padding: 3px 8px;
-  font-size: 0.58rem;
-  letter-spacing: 0.18em;
-  transition: color 0.2s, border-color 0.2s, opacity 0.3s;
-}
-.rt-acceso:hover { color: #ffaa00; border-color: #ffaa0066; }
-
-/* Modo claro */
-body.light-mode {
-  --c-bg: #f5f0e8;
-  --c-bg2: #ede8dc;
-  --c-amber: #8a5a00;
-  --c-amber2: #6a4010;
-  background: #f5f0e8;
-}
-body.light-mode .rt-nav { background: rgba(240,235,220,0.95); border-color: #c8b090; }
-body.light-mode .rt-nav a, body.light-mode .rt-cur { color: #8a5a00; }
-body.light-mode .rt-sep { color: #c8b090; }
-body.light-mode .rt-acceso { color: #8a5a00; border-color: #c8b090; }
-body.light-mode .crt-overlay, body.light-mode .vignette { opacity: 0; }
-
 /* compensar barra fija en pantallas del juego */
 .screen { padding-top: 36px; }
 @media (max-width: 480px) {
-  .rt-nav { font-size: 0.52rem; padding: 6px 10px; }
   .screen { padding-top: 32px; }
 }

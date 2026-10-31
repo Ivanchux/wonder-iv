@@ -1,9 +1,9 @@
 // WONDER IV — Menú: el asentamiento. Las maravillas se levantan en el mapa según las vas completando
 // y los edificios básicos se mejoran con los materiales que entregan los operarios.
 
-const WONDER_SPOTS=[[30,262],[250,372],[470,262],[690,372],[910,262],[1130,372],[1350,262]];   // esquina superior izquierda de cada maravilla (viewBox 1600×900)
-const BUILD_SPOTS=[[70,652],[370,652],[670,652],[970,652],[1270,652]];
-const WS_W=220, WS_H=172, BS_W=210, BS_H=158;
+const WONDER_SPOTS=[[170,335],[370,445],[570,335],[770,445],[970,335],[1170,445],[1370,335]];   // centro y pie de cada maravilla (viewBox 1600×900, sobre img/mapa_asentamiento.jpg)
+const BUILD_SPOTS=[[70,640],[370,640],[670,640],[970,640],[1270,640]];
+const WS=210, BS_W=210, BS_H=158;
 
 // ── Edificios (viewBox local 200×150) ──
 const ADOBE='#d9b98a', ADOBE_D='#a98a5a', ROOF='#8a5a30', STN='#b9ab8a', STN_D='#7a6a58', DK='#3a2610';
@@ -34,43 +34,27 @@ function buildingArt(id,lv){
 
 // ── Mapa ──
 function nestedSVG(svg,x,y,w,h){ return svg.replace('<svg ',`<svg x="${x}" y="${y}" width="${w}" height="${h}" `); }
-function tree(x,y,k){ return k==='c'
-  ? `<g transform="translate(${x} ${y})"><path d="M0 0Q-12 -38 0 -78Q12 -38 0 0Z" fill="#2f6a30" stroke="#1c3e1c" stroke-width="2"/><rect x="-2" y="0" width="4" height="8" fill="#5a3a18"/></g>`
-  : k==='p' ? `<g transform="translate(${x} ${y})"><path d="M0 0Q-3 -34 4 -62" stroke="#6a4a22" stroke-width="5" fill="none"/><g fill="#3a8a3a" stroke="#1c4a1c" stroke-width="1.5"><path d="M4 -62Q-18 -64 -30 -50Q-10 -58 4 -62Z"/><path d="M4 -62Q22 -70 36 -56Q16 -60 4 -62Z"/><path d="M4 -62Q-4 -82 -16 -86Q-2 -76 4 -62Z"/><path d="M4 -62Q12 -82 26 -84Q12 -74 4 -62Z"/></g></g>`
-  : `<g transform="translate(${x} ${y})"><rect x="-3" y="-18" width="6" height="20" fill="#6a4a22"/><circle cx="0" cy="-30" r="20" fill="#7a9a48" stroke="#44602a" stroke-width="2"/><circle cx="-8" cy="-34" r="9" fill="#92b05c"/></g>`; }
-
 function settlementSVG(){
   const nextIdx=WONDERS.findIndex((w,i)=>getBestStars(i)===0 && (i===0||getBestStars(i-1)>0));
   let s=`<svg id="set-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Tu asentamiento">`;
-  s+=`<rect width="1600" height="900" fill="url(#sc-sky)"/><rect width="1600" height="900" fill="url(#sc-sun)"/>`;
-  [[260,110,120,0,'-10s',110],[1220,90,140,0,'-60s',140],[760,150,100,0,'-35s',95]].forEach(([x,y,rx,_,dl,du])=>{ s+=`<g class="cloud" style="animation-duration:${du}s;animation-delay:${dl}"><g fill="#fff" opacity=".9"><ellipse cx="${x}" cy="${y}" rx="${rx}" ry="24"/><ellipse cx="${x+60}" cy="${y-18}" rx="${rx*.65}" ry="22"/></g></g>`; });
+  s+=`<image href="img/mapa_asentamiento.jpg" x="0" y="0" width="1600" height="900" preserveAspectRatio="xMidYMid slice"/>`;
   [[120,'0s',46],[260,'-18s',58]].forEach(([y,dl,du])=>{ s+=`<g class="bird" style="--y:${y}px;animation-duration:${du}s;animation-delay:${dl}"><path class="flap" d="M0 0Q7-9 14 0Q21-9 28 0" fill="none" stroke="#24385a" stroke-width="2.4" stroke-linecap="round"/></g>`; });
-  s+=`<path d="M0 270Q160 190 330 250T640 230T980 262T1320 214T1600 250V900H0Z" fill="#9ab8c8" opacity=".6"/>`;
-  s+=`<path d="M0 330Q200 262 430 318T880 300T1300 322T1600 290V900H0Z" fill="url(#sc-hill1)"/>`;
-  s+=`<path d="M0 440Q260 392 560 436T1100 424T1600 440V900H0Z" fill="url(#sc-hill2)"/>`;
-  s+=`<g transform="translate(0 -36)">`;
-  // camino de tierra
-  s+=`<path d="M-20 596Q220 560 460 588T940 584T1360 590T1620 574V604Q1360 624 940 612T460 618T-20 624Z" fill="#c8a66a" stroke="#8a6a3a" stroke-width="2"/>`;
-  // río con dos puentes
-  s+=`<path d="M-20 650Q260 626 560 654T1100 646T1620 654V690Q1340 704 1060 690T520 694T-20 688Z" fill="#4a90c8" stroke="#2a5a88" stroke-width="2"/><path class="shim" d="M80 664Q300 650 520 668M700 668Q900 654 1120 668M1240 668Q1400 660 1580 668" stroke="#d8f0ff" stroke-width="3" fill="none" stroke-dasharray="46 30" opacity=".8"/>`;
-  [[300,632],[1000,628]].forEach(([x,y])=>{ s+=`<g><rect x="${x}" y="${y}" width="70" height="72" fill="#b08850" stroke="#5a3a18" stroke-width="2"/><path d="M${x} ${y+8}H${x+70}M${x} ${y+24}H${x+70}M${x} ${y+40}H${x+70}M${x} ${y+56}H${x+70}" stroke="#7a5428" stroke-width="2"/></g>`; });
-  s+=`</g><path d="M0 668Q400 654 800 670T1600 664V900H0Z" fill="#5e9a48"/>`;
-  [[14,560,'c'],[1578,552,'c'],[236,640,'o'],[1175,648,'p'],[1480,640,'o'],[20,780,'o'],[1560,800,'p'],[640,640,'c'],[1380,650,'c']].forEach(([x,y,k])=>{ s+=tree(x,y,k); });
+  s+=`<path class="shim" d="M60 560Q300 548 560 562M700 562Q900 552 1100 562M1180 560Q1400 552 1580 560" stroke="#e8f6ff" stroke-width="3" fill="none" stroke-dasharray="46 30" opacity=".55" pointer-events="none"/>`;
   // aldeanos que pasean por el camino
-  [['b_walk',60,1500,562,70,0,52],['c_walk',1480,120,572,84,-30,52],['d_walk',300,1200,566,60,-12,50]].forEach(([k,x0,x1,y,du,dl,H])=>{ if(typeof SPRITES==='undefined'||!SPRITES[k]) return; const sp=SPRITES[k], w=Math.round(sp.w*H/sp.h);
+  [['b_walk',60,1500,497,70,0,52],['c_walk',1480,120,507,84,-30,52],['d_walk',300,1200,502,60,-12,50]].forEach(([k,x0,x1,y,du,dl,H])=>{ if(typeof SPRITES==='undefined'||!SPRITES[k]) return; const sp=SPRITES[k], w=Math.round(sp.w*H/sp.h);
     s+=`<g class="walker" style="--x0:${x0}px;--x1:${x1}px;--y:${y}px;animation-duration:${du}s;animation-delay:${dl}s"><svg x="${-w/2}" y="${-H}" width="${w}" height="${H}" viewBox="0 0 ${w} ${H}" overflow="hidden"><image class="sprs" href="img/obreros/${k}.png" width="${w*sp.n}" height="${H}" style="--end:${-w*sp.n}px"/></svg></g>`; });
-  // maravillas
+  // maravillas (ilustraciones en img/maravillas)
   WONDERS.forEach((w,i)=>{
-    const [x,y]=WONDER_SPOTS[i], stars=getBestStars(i), locked=i>0&&getBestStars(i-1)===0, done=stars>0, next=i===nextIdx;
-    const cls='plot wonder-plot'+(locked?' locked':'')+(done?' done':'')+(next?' next':'');
+    const [cx,feet]=WONDER_SPOTS[i], x=cx-WS/2, y=feet-WS, stars=getBestStars(i), locked=i>0&&getBestStars(i-1)===0, done=stars>0, next=i===nextIdx;
+    const cls='plot wonder-plot'+(locked?' locked':'')+(done?' done':(locked?'':' todo'))+(next?' next':'');
     s+=`<g class="${cls}" data-kind="wonder" data-i="${i}" tabindex="${locked?-1:0}" role="button" aria-label="${w.name}${locked?' (bloqueada)':''}"><title>${w.name}${locked?' (bloqueada)':done?' — completada':''}</title>`;
-    s+=`<ellipse cx="${x+WS_W/2}" cy="${y+WS_H-4}" rx="${WS_W*.46}" ry="10" fill="#6a4a20" opacity=".35"/>`;
-    s+=`<g class="w-art">${nestedSVG(wonderSceneSVG(w.id,done?w.stages:0,{ground:false}),x,y,WS_W,WS_H)}</g>`;
-    s+=`<g transform="translate(${x+WS_W/2} ${y+WS_H+14})"><rect x="-96" y="-2" width="192" height="26" rx="8" fill="#f2e4b8" stroke="#6a4a1c" stroke-width="2"/><text y="16" text-anchor="middle" font-family="Cinzel,Georgia,serif" font-weight="700" font-size="13" fill="#2a1604" letter-spacing="1"${w.name.length>20?' textLength="176" lengthAdjust="spacingAndGlyphs"':''}>${w.name}</text>`;
+    s+=`<ellipse cx="${cx}" cy="${feet-4}" rx="${WS*.4}" ry="10" fill="#1c2a08" opacity=".35"/>`;
+    s+=`<g class="w-art"><image href="img/maravillas/maravilla_${w.id}.png" x="${x}" y="${y}" width="${WS}" height="${WS}" preserveAspectRatio="xMidYMax meet"/></g>`;
+    s+=`<g transform="translate(${cx} ${feet+10})"><rect x="-96" y="-2" width="192" height="26" rx="8" fill="#f2e4b8" stroke="#6a4a1c" stroke-width="2"/><text y="16" text-anchor="middle" font-family="Cinzel,Georgia,serif" font-weight="700" font-size="13" fill="#2a1604" letter-spacing="1"${w.name.length>20?' textLength="176" lengthAdjust="spacingAndGlyphs"':''}>${w.name}</text>`;
     s+=`<text y="42" text-anchor="middle" font-size="18" fill="${done?'#e0a020':'#6a5a3a'}" stroke="#2a1604" stroke-width=".6">${[0,1,2].map(k=>k<stars?'★':'☆').join(' ')}</text></g>`;
-    if(done) s+=`<g transform="translate(${x+WS_W-26} ${y+4})"><path d="M0 0V40" stroke="#5a3a18" stroke-width="3"/><path class="flag" d="M1.5 2H26L19 9L26 16H1.5Z" fill="#c8402a" stroke="#6a1a10" stroke-width="1.5"/></g><g class="glint" transform="translate(${x+WS_W/2} ${y+WS_H*.45})"><path d="M0 -12L3 -3L12 0L3 3L0 12L-3 3L-12 0L-3 -3Z" fill="#fff6c0"/></g>`;
-    if(locked) s+=`<g transform="translate(${x+WS_W/2} ${y+WS_H/2})"><circle r="22" fill="#2a1604" opacity=".75"/><rect x="-10" y="-4" width="20" height="16" rx="2" fill="#e0c070"/><path d="M-6 -4V-10Q-6 -18 0 -18Q6 -18 6 -10V-4" fill="none" stroke="#e0c070" stroke-width="3"/></g>`;
-    if(next) s+=`<g transform="translate(${x+WS_W/2} ${y-2})"><g class="pulse"><path d="M-14 -22H14L0 0Z" fill="#f2d27a" stroke="#6a4a1c" stroke-width="2"/></g></g>`;
+    if(done) s+=`<g transform="translate(${cx+WS*.38} ${feet-6})"><path d="M0 0V40" transform="translate(0 -40)" stroke="#5a3a18" stroke-width="3"/><path class="flag" d="M1.5 -38H26L19 -31L26 -24H1.5Z" fill="#c8402a" stroke="#6a1a10" stroke-width="1.5"/></g><g class="glint" transform="translate(${cx} ${y+WS*.4})"><path d="M0 -12L3 -3L12 0L3 3L0 12L-3 3L-12 0L-3 -3Z" fill="#fff6c0"/></g>`;
+    if(locked) s+=`<g transform="translate(${cx} ${y+WS*.58})"><circle r="22" fill="#2a1604" opacity=".75"/><rect x="-10" y="-4" width="20" height="16" rx="2" fill="#e0c070"/><path d="M-6 -4V-10Q-6 -18 0 -18Q6 -18 6 -10V-4" fill="none" stroke="#e0c070" stroke-width="3"/></g>`;
+    if(next) s+=`<g transform="translate(${cx} ${y-2})"><g class="pulse"><path d="M-14 -22H14L0 0Z" fill="#f2d27a" stroke="#6a4a1c" stroke-width="2"/></g></g>`;
     s+=`</g>`;
   });
   // edificios
@@ -105,14 +89,14 @@ function renderSettlement(){
   { const done=WONDERS.filter((w,i)=>getBestStars(i)>0).length, stars=WONDERS.reduce((a,w,i)=>a+getBestStars(i),0); const e=document.getElementById('set-prog'); if(e) e.textContent=`OBRAS ${done}/${WONDERS.length} · ★ ${stars}/${WONDERS.length*3}`; }
 }
 function closePanel(){ const p=document.getElementById('set-panel'); if(p){ p.classList.remove('show'); p.innerHTML=''; } }
-function openPanel(html){ const p=document.getElementById('set-panel'); p.innerHTML=`<button class="sp-x" onclick="closePanel()" aria-label="Cerrar">✕</button>${html}`; p.classList.add('show'); }
+function openPanel(html,bottom){ const p=document.getElementById('set-panel'); p.innerHTML=`<button class="sp-x" onclick="closePanel()" aria-label="Cerrar">✕</button>${html}`; p.classList.toggle('at-bottom',!!bottom); p.classList.add('show'); }
 
 function showWonderPanel(i){
   const w=WONDERS[i], stars=getBestStars(i), best=getBestScore(i);
   openPanel(`<div class="sp-eyebrow">MARAVILLA ${String(i+1).padStart(2,'0')} · ${w.place} · ${w.year}</div><div class="sp-title">${w.name}</div><p class="sp-desc">${w.desc}</p>
   <div class="sp-tags"><span class="wc-tag diff-${w.diff}">${diffLabel(w.diff)}</span><span class="wc-tag">${w.rocks.length} BLOQUES EN EL TABLERO</span><span class="wc-tag">${w.stages} PARA CONSTRUIRLA</span><span class="wc-tag">${MATERIALS[w.mat].name}</span>${best?`<span class="wc-tag">MEJOR: ${best}</span>`:''}</div>
   <div class="sp-stars">${[0,1,2].map(k=>`<span class="${k<stars?'on':''}">★</span>`).join('')}</div>
-  <button class="btn btn-hint" onclick="closePanel();startLevel(${i})">${stars?'⟳ VOLVER A OBRA':'▶ EMPEZAR OBRA'}</button>`);
+  <button class="btn btn-hint" onclick="closePanel();startLevel(${i})">${stars?'⟳ VOLVER A OBRA':'▶ EMPEZAR OBRA'}</button>`,true);
 }
 function showBuildPanel(id){
   const b=BUILDINGS.find(x=>x.id===id), lv=buildingLevel(id), st=getStock(), have=st[b.mat]||0, last=lv>=BUILD_MAX;
@@ -130,7 +114,7 @@ function doUpgrade(id){ if(upgradeBuilding(id)){ Snd.play('upgrade'); renderSett
 (function bindSettlement(){
   const map=document.getElementById('set-map'); if(!map) return;
   const act=e=>{ const g=e.target.closest('[data-kind]'); if(!g) { if(e.target.closest('svg')) closePanel(); return; }
-    if(g.dataset.kind==='wonder'){ const i=+g.dataset.i; if(g.classList.contains('locked')){ openPanel(`<div class="sp-title">${WONDERS[i].name}</div><p class="sp-desc">Completa antes «${WONDERS[i-1].name}» para empezar esta obra.</p>`); } else showWonderPanel(i); }
+    if(g.dataset.kind==='wonder'){ const i=+g.dataset.i; if(g.classList.contains('locked')){ openPanel(`<div class="sp-title">${WONDERS[i].name}</div><p class="sp-desc">Completa antes «${WONDERS[i-1].name}» para empezar esta obra.</p>`,true); } else showWonderPanel(i); }
     else showBuildPanel(g.dataset.id); };
   map.addEventListener('click',act);
   map.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); act(e); } });

@@ -69,7 +69,7 @@ async function showWin(){
 
   document.getElementById('ov-title').textContent='COMPLETO';
   document.getElementById('ov-sub').textContent=`${w.name} — CONSTRUIDA`;
-  document.getElementById('ov-scene').innerHTML=wonderSceneSVG(w.id,w.stages);
+  { const sc=document.getElementById('ov-scene'); sc.style.backgroundImage=`url(img/fondos/fondo_${w.id}.jpg)`; sc.innerHTML=`<img class="ov-wonder" src="img/maravillas/maravilla_${w.id}.png" alt="${w.name}">`; }
   const got=Object.entries(matsGot); got.forEach(([m,n])=>addStock(m,n));
   document.getElementById('ov-mats').innerHTML=got.map(([m,n])=>`<span class="mchip"><img src="img/bloques/bloque_${m}.png" alt=""><b>+${n}</b><i>${MATERIALS[m].name}</i></span>`).join('');
   { const st=getStock(), can=BUILDINGS.filter(b=>{ const lv=buildingLevel(b.id); return lv<BUILD_MAX&&(st[b.mat]||0)>=b.cost[lv]; }); document.getElementById('ov-tip').textContent=can.length?'Puedes mejorar en el asentamiento: '+can.map(b=>b.name.toLowerCase()).join(', '):''; }
@@ -96,7 +96,7 @@ function showLose(){
   kept.forEach(([m,n])=>addStock(m,n));
   document.getElementById('ov-title').textContent='OBRA PARADA';
   document.getElementById('ov-sub').textContent='SE ACABARON LOS MOVIMIENTOS';
-  document.getElementById('ov-scene').innerHTML='';
+  { const sc=document.getElementById('ov-scene'); sc.innerHTML=''; sc.style.backgroundImage=''; }
   document.getElementById('ov-tip').textContent='';
   document.getElementById('ov-mats').textContent=kept.length?'Te llevas la mitad: '+kept.map(([m,n])=>`${MATERIALS[m].name} +${n}`).join('  ·  '):'';
   document.getElementById('ov-score').textContent=`${score} PTS`;

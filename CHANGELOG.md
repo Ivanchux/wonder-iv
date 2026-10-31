@@ -1,5 +1,12 @@
 # Registro de cambios
 
+## 1.6 · Maravillas y mapa ilustrados
+- Las siete maravillas y el mapa del asentamiento son ilustraciones propias (`img/maravillas/`, `img/mapa_asentamiento.jpg`): ya no queda ningún dibujo vectorial a la vista salvo el solar vacío. Se recolocan sobre el nuevo mapa: dos filas escalonadas sobre la pradera, el camino con los aldeanos, el río con sus puentes y los cinco edificios en el prado.
+- Las maravillas completadas salen en color y con bandera, las abiertas aún sin construir en gris atenuado y las bloqueadas con candado.
+- La pantalla de victoria enseña la maravilla terminada sobre el fondo de su obra.
+- Se eliminan los dibujos SVG de las siete maravillas de `js/maravillas.js`.
+- `tools/build-art.py` procesa también las maravillas y el mapa.
+
 ## 1.5 · Edificios ilustrados
 - Los cinco edificios del asentamiento ya son ilustraciones propias en sus dos niveles (cabaña y casa de dos pisos, pozo y pozo con abrevadero, horno de una y de dos cúpulas, taller y taller con estatua, forja con uno y con dos hornos). El solar vacío sigue en SVG.
 - `tools/build-art.py` procesa también los edificios (`img/edificios/`) y ya no pisa `js/arte.js` si no hay marco.

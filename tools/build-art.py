@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Procesa las imágenes sueltas sobre verde #00FF00 (piezas, bloques, marco, columna) a PNG con transparencia.
 
-Uso: python3 tools/build-art.py CARPETA   (con las claves como nombre: gema_sol.png, bloque_piedra.png, marco.png, columna.png, edif_pozo_1.png...)
+Uso: python3 tools/build-art.py CARPETA   (con las claves como nombre: gema_sol.png, bloque_piedra.png, marco.png, columna.png, edif_pozo_1.png, maravilla_faro.png, mapa_asentamiento.png...)
 Escribe img/piezas, img/bloques, img/edificios, img/marco.png, img/columna.png y, si hay marco, js/arte.js (medidas del hueco).
 """
 import json, sys, pathlib
@@ -10,7 +10,7 @@ from PIL import Image
 
 root = pathlib.Path(__file__).resolve().parent.parent
 src = pathlib.Path(sys.argv[1])
-SIZES = {'gema': 192, 'bloque': 176, 'marco': 800, 'columna': 760, 'edif': 460}   # lado mayor en px (al doble de lo que se ve)
+SIZES = {'gema': 192, 'bloque': 176, 'marco': 800, 'columna': 760, 'edif': 460, 'maravilla': 440}   # lado mayor en px (al doble de lo que se ve)
 
 def key(img):
     a = np.asarray(img.convert('RGB')).astype(np.float32)
@@ -31,11 +31,15 @@ meta = {}
 for f in sorted(src.glob('*.png')):
     k = f.stem
     kind = k.split('_')[0]
+    if kind == 'mapa':   # paisaje sin fondo verde: solo se reduce y se guarda como JPG
+        im = Image.open(f).convert('RGB'); im = im.resize((1600, round(1600 * im.height / im.width)), Image.LANCZOS)
+        im.save(root / 'img' / (k + '.jpg'), quality=84, optimize=True, progressive=True); print(k, im.size); continue
     im = key(Image.open(f))
     out, bb = crop_resize(im, SIZES[kind])
     if kind == 'gema': d = root / 'img' / 'piezas'
     elif kind == 'bloque': d = root / 'img' / 'bloques'
     elif kind == 'edif': d = root / 'img' / 'edificios'
+    elif kind == 'maravilla': d = root / 'img' / 'maravillas'
     else: d = root / 'img'
     d.mkdir(parents=True, exist_ok=True)
     out.save(d / f'{k}.png', optimize=True)

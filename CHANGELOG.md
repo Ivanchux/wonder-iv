@@ -1,5 +1,9 @@
 # Registro de cambios
 
+## 1.5 · Edificios ilustrados
+- Los cinco edificios del asentamiento ya son ilustraciones propias en sus dos niveles (cabaña y casa de dos pisos, pozo y pozo con abrevadero, horno de una y de dos cúpulas, taller y taller con estatua, forja con uno y con dos hornos). El solar vacío sigue en SVG.
+- `tools/build-art.py` procesa también los edificios (`img/edificios/`) y ya no pisa `js/arte.js` si no hay marco.
+
 ## 1.4 · Pulido: sonido, música y efectos
 - **Sonido y música propios**, sintetizados con Web Audio (sin archivos de audio): ocho pistas (pueblo y una por maravilla, cada una con su escala, tempo e instrumentos) y unos treinta efectos. La música cambia al entrar y salir de una obra, baja con los jingles de victoria y derrota y se pausa al cambiar de pestaña.
 - **Ajustes** (⚙ o `Esc`): volumen y silencio de música y efectos, «reducir movimiento», ayuda y borrar progreso. Atajos `M`, `F`, `H` y `Esc`.

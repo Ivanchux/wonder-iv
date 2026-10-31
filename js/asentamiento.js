@@ -77,7 +77,11 @@ function settlementSVG(){
   BUILDINGS.forEach((b,i)=>{
     const [x,y]=BUILD_SPOTS[i], lv=buildingLevel(b.id), can=lv<BUILD_MAX && (getStock()[b.mat]||0)>=b.cost[lv];
     s+=`<g class="plot build-plot${can?' can':''}" data-kind="build" data-id="${b.id}" tabindex="0" role="button" aria-label="${b.name}, nivel ${lv}"><title>${b.name} · nivel ${lv}/${BUILD_MAX}</title>`;
-    s+=`<g class="w-art">${nestedSVG(`<svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">${buildingArt(b.id,lv)}</svg>`,x,y,BS_W,BS_H)}</g>`;
+    // nivel 1 y 2: ilustraciones de img/edificios; nivel 0: el solar dibujado en SVG
+    const art=lv>=1
+      ? nestedSVG(`<svg viewBox="-10 -40 220 190" xmlns="http://www.w3.org/2000/svg">${SHADOW}<image href="img/edificios/edif_${b.id}_${lv}.png" x="-10" y="-40" width="220" height="190" preserveAspectRatio="xMidYMax meet"/></svg>`,x-5,y-34,BS_W+10,BS_H+36)
+      : nestedSVG(`<svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">${buildingArt(b.id,0)}</svg>`,x,y,BS_W,BS_H);
+    s+=`<g class="w-art">${art}</g>`;
     s+=`<g transform="translate(${x+BS_W/2} ${y+BS_H+8})"><rect x="-98" y="-2" width="196" height="26" rx="8" fill="#f2e4b8" stroke="#6a4a1c" stroke-width="2"/><text y="16" text-anchor="middle" font-family="Cinzel,Georgia,serif" font-weight="700" font-size="12" fill="#2a1604" letter-spacing=".5">${b.name}</text>`;
     s+=`<text y="42" text-anchor="middle" font-family="Cinzel,Georgia,serif" font-size="13" font-weight="700" fill="#fff6d8" stroke="#2a1604" stroke-width="3" paint-order="stroke">NIVEL ${lv} / ${BUILD_MAX}</text></g>`;
     if(can) s+=`<g transform="translate(${x+BS_W-14} ${y+6})"><g class="pulse"><circle r="15" fill="#f2d27a" stroke="#6a4a1c" stroke-width="2"/><path d="M0 8V-8M-7 -1L0 -8L7 -1" stroke="#2a1604" stroke-width="3" fill="none" stroke-linecap="round"/></g></g>`;

@@ -138,7 +138,7 @@ python3 -m http.server 8000   # http://localhost:8000
 ## 🔧 Detalles técnicos
 
 - **HTML, CSS y JavaScript planos.** Los scripts son clásicos (no módulos), se cargan en orden y comparten el ámbito global.
-- **Arte:** piezas, bloques, marco, columnas, fondos de las siete obras y operarios son ilustraciones en `img/`; el mapa del asentamiento, los edificios y las siete maravillas se dibujan en SVG desde el código (`js/asentamiento.js`, `js/maravillas.js`). Más detalles en [`docs/ARTE.md`](docs/ARTE.md).
+- **Arte:** piezas, bloques, marco, columnas, fondos de las siete obras y operarios son ilustraciones en `img/`; los edificios del asentamiento (niveles 1 y 2) son ilustraciones en `img/edificios/`; el mapa, los solares vacíos y las siete maravillas se dibujan en SVG desde el código (`js/asentamiento.js`, `js/maravillas.js`). Más detalles en [`docs/ARTE.md`](docs/ARTE.md).
 - **Operarios** animados con hojas de 8 fotogramas (`img/obreros/`) y `steps()` de CSS; con `prefers-reduced-motion` se quedan quietos y las entregas son instantáneas.
 - **Entrada unificada** con *pointer events*: toque sobre dos piezas contiguas o deslizamiento, válidos para ratón, táctil y lápiz.
 - **Guardado** en `localStorage` dentro de `try/catch`: récord y estrellas (`wonder_best_*`, `wonder_stars_*`), materiales (`wonder_stock`), edificios (`wonder_build`), sonido (`wonder_audio`) y ajustes (`wonder_reduce`, `wonder_tuto`).
@@ -178,7 +178,7 @@ wonder-iv/
 │   ├── sprites.js      # (generado) medidas de las hojas de operarios
 │   ├── arte.js         # (generado) medidas del marco del tablero
 │   └── main.js         # Arranque y botón de modo claro/oscuro
-├── img/                # piezas, bloques, marco, columna, fondos y obreros
+├── img/                # piezas, bloques, edificios, marco, columna, fondos y obreros
 ├── tools/              # prueba/jugar.mjs, build-sprites.py, build-art.py, build-icons.py
 ├── docs/               # Banner, capturas, GIFs, ARTE.md y los prompts de las imágenes
 ├── CHANGELOG.md
@@ -190,7 +190,7 @@ wonder-iv/
 
 - [ ] Jugar solo con teclado
 - [ ] Más pistas de música y una voz de cantero para las reacciones
-- [ ] Ilustraciones propias para los edificios y el mapa (los prompts están en `docs/PROMPTS_ASENTAMIENTO.md`)
+- [ ] Ilustración propia para el mapa del asentamiento, el solar vacío y el título (los prompts están en `docs/PROMPTS_ASENTAMIENTO.md`)
 - [ ] Equilibrar movimientos y costes con partidas de personas reales
 - [ ] Textos en inglés
 

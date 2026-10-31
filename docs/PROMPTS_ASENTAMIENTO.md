@@ -2,7 +2,7 @@
 
 Opcional: sustituyen a los dibujos SVG de los edificios. Cada prompt se pega **tal cual**. Todos son **cuadrados 1:1**, fondo verde liso, con la misma vista (de frente con algo de perspectiva, como las piezas), para que encajen entre sí. Pásame los archivos con el nombre que figura en cada apartado.
 
-Orden: 1 a 10 (los cinco edificios, nivel 1 y nivel 2), 11 (solar vacío), 12 (título).
+Orden: 1 a 10 (los cinco edificios, nivel 1 y nivel 2), 11 (solar vacío), 12 (título). **Los prompts 1 a 10 ya se han usado y las imágenes están integradas en `img/edificios/`; quedan por generar el 11 y el 12.**
 
 ---
 

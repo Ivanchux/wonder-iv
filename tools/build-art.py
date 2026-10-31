@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Procesa las imágenes sueltas sobre verde #00FF00 (piezas, bloques, marco, columna) a PNG con transparencia.
 
-Uso: python3 tools/build-art.py CARPETA   (con las claves como nombre: gema_sol.png, bloque_piedra.png, marco.png, columna.png...)
-Escribe img/piezas, img/bloques, img/marco.png, img/columna.png y js/arte.js (medidas del marco).
+Uso: python3 tools/build-art.py CARPETA   (con las claves como nombre: gema_sol.png, bloque_piedra.png, marco.png, columna.png, edif_pozo_1.png...)
+Escribe img/piezas, img/bloques, img/edificios, img/marco.png, img/columna.png y, si hay marco, js/arte.js (medidas del hueco).
 """
 import json, sys, pathlib
 import numpy as np
@@ -10,7 +10,7 @@ from PIL import Image
 
 root = pathlib.Path(__file__).resolve().parent.parent
 src = pathlib.Path(sys.argv[1])
-SIZES = {'gema': 192, 'bloque': 176, 'marco': 800, 'columna': 760}   # lado mayor en px (al doble de lo que se ve)
+SIZES = {'gema': 192, 'bloque': 176, 'marco': 800, 'columna': 760, 'edif': 460}   # lado mayor en px (al doble de lo que se ve)
 
 def key(img):
     a = np.asarray(img.convert('RGB')).astype(np.float32)
@@ -35,6 +35,7 @@ for f in sorted(src.glob('*.png')):
     out, bb = crop_resize(im, SIZES[kind])
     if kind == 'gema': d = root / 'img' / 'piezas'
     elif kind == 'bloque': d = root / 'img' / 'bloques'
+    elif kind == 'edif': d = root / 'img' / 'edificios'
     else: d = root / 'img'
     d.mkdir(parents=True, exist_ok=True)
     out.save(d / f'{k}.png', optimize=True)
@@ -48,4 +49,5 @@ for f in sorted(src.glob('*.png')):
                          'iw': round((x1 - x0) / out.width, 4), 'ih': round((y1 - y0) / out.height, 4)}
     print(k, out.size)
 
-(root / 'js' / 'arte.js').write_text('// Generado por tools/build-art.py: posición del hueco liso dentro de img/marco.png (fracciones del tamaño)\nconst ARTE=' + json.dumps(meta, separators=(',', ':')) + ';\n', encoding='utf-8')
+if meta:
+    (root / 'js' / 'arte.js').write_text('// Generado por tools/build-art.py: posición del hueco liso dentro de img/marco.png (fracciones del tamaño)\nconst ARTE=' + json.dumps(meta, separators=(',', ':')) + ';\n', encoding='utf-8')

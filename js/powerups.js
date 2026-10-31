@@ -11,7 +11,7 @@ function activatePowerup(type){
   }
   // Toggle
   if(activePu===type){ activePu=null; updatePowerups(); return; }
-  activePu=type;
+  activePu=type; Snd.play('select');
   updatePowerups();
   log(`Poder activado: ${type.toUpperCase()}. Selecciona una ficha.`, 'warn');
 }
@@ -20,7 +20,7 @@ function useShuffle(){
   if(puCounts.shuffle<=0||busy) return;
   busy=true;
   puCounts.shuffle--;
-  shuffleBoard();
+  shuffleBoard(); Snd.play('shuffle');
   updatePowerups();
   log('Tablero revuelto.','warn');
   busy=false;
@@ -44,6 +44,7 @@ async function applyPowerupAt(r, c){
     for(const k of [...setB]){ if(isRock(board[Math.floor(k/COLS)][k%COLS])) setB.delete(k); }
     const cells=[...setB].map(k=>({r:Math.floor(k/COLS),c:k%COLS}));
     spawnGemBurst(cells,'#ffaa0044');
+    Snd.play('bomb'); FX.shake(340,1.2); { const p=FX.center(r,c); if(p){ FX.ring(p.x,p.y,'#ffaa40',150); FX.burst(p.x,p.y,['#ffaa40','#ff6a20','#fff0a0'],18,{max:260}); } }
     log(`BOMBA — ${cells.length} piezas.`,'warn');
     await wait(300);
     const pts=cells.filter(({r,c})=>!isRock(board[r][c])).length*80;
@@ -64,6 +65,7 @@ async function applyPowerupAt(r, c){
     for(const k of [...setR]){ if(isRock(board[Math.floor(k/COLS)][k%COLS])) setR.delete(k); }
     const cells=[...setR].map(k=>({r:Math.floor(k/COLS),c:k%COLS}));
     spawnGemBurst(cells,'#00e5ff44');
+    Snd.play('ray'); FX.shake(220,0.5); { const a=FX.center(r,0), b=FX.center(r,COLS-1); if(a&&b) FX.beam(a.x-30,a.y,b.x+30,b.y); }
     log(`RAYO — fila ${r+1}.`,'info');
     await wait(300);
     const pts2=cells.filter(({r,c})=>!isRock(board[r][c])).length*80;
@@ -86,6 +88,7 @@ async function applyPowerupAt(r, c){
       if(board[rr][cc]?.t===ttype) cells2.push({r:rr,c:cc});
     }
     spawnGemBurst(cells2, TILE_COLORS[ttype]+'44');
+    Snd.play('aurora'); { const p=FX.boardCenter(); FX.rain(p.x,p.y-p.w/2,p.w,TILE_COLORS[ttype]); }
     log(`AURORA — ${cells2.length}× ${TILE_NAMES[ttype]}.`,'rune');
     await wait(300);
     const pts3=cells2.length*100;

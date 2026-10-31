@@ -11,7 +11,7 @@ function isGem(tile){ return tile?.kind==='gem-line'||tile?.kind==='gem-area'; }
 //  START LEVEL
 // ════════════════════════════════════════
 function startLevel(idx){
-  runId++;
+  runId++; Snd.music('l'+idx);
   level=idx; score=0; moves=WONDERS[level].movs;
   combo=1; wonderProg=0; prevProgSegs=0;
   selected=null; busy=false; hintPair=[];
@@ -31,6 +31,7 @@ function startLevel(idx){
   buildBoard();
   requestAnimationFrame(()=>{ relayoutBoard(); });
   preloadSprites(); renderSite(); fillLane(); updateUI(); updateWonder(); updatePowerups();
+  showIntro(w);
   log('Obra iniciada.','dim');
   { const extra=BUILDINGS.filter(b=>buildingLevel(b.id)).map(b=>b.name.split(' ')[0]).join(', '); if(extra) log('Tu asentamiento ayuda: '+extra.toLowerCase()+'.','info'); }
   log(`${w.name}: rompe las rocas para conseguir ${MATERIALS[w.mat].name}.`, 'info');
@@ -174,8 +175,8 @@ function bindInputHandlers(){
 
 function handleTap(r,c){
   clearHints();
-  if(isRock(board[r][c])){ clearSel(); rockNudge(r,c); return; }
-  if(selected===null){ selected={r,c}; getCell(r,c)?.classList.add('selected'); return; }
+  if(isRock(board[r][c])){ clearSel(); rockNudge(r,c); Snd.play('thud'); { const p=FX.center(r,c); if(p) FX.dust(p.x,p.y,4); } return; }
+  if(selected===null){ selected={r,c}; getCell(r,c)?.classList.add('selected'); Snd.play('select'); return; }
   if(selected.r===r&&selected.c===c){ clearSel(); return; }
   const dr=Math.abs(selected.r-r), dc=Math.abs(selected.c-c);
   const pr=selected.r, pc2=selected.c;
@@ -191,7 +192,7 @@ function clearSel(){ if(selected){ getCell(selected.r,selected.c)?.classList.rem
 // ════════════════════════════════════════
 async function doSwap(r1,c1,r2,c2){
   if(isRock(board[r1][c1])||isRock(board[r2][c2])){ rockNudge(isRock(board[r1][c1])?r1:r2,isRock(board[r1][c1])?c1:c2); return; }
-  busy=true;
+  busy=true; Snd.play('swap');
   const el1=getCell(r1,c1), el2=getCell(r2,c2);
   const SWAP_MS=140;
   if(el1) applyPos(el1,r2,c2,true,SWAP_MS);
@@ -218,7 +219,7 @@ async function doSwap(r1,c1,r2,c2){
     swap(r1,c1,r2,c2);
     const tmp2=cellDom[r1][c1]; cellDom[r1][c1]=cellDom[r2][c2]; cellDom[r2][c2]=tmp2;
     syncCell(r1,c1); syncCell(r2,c2);
-    log('Sin combinacion.','err'); busy=false; return;
+    log('Sin combinacion.','err'); Snd.play('invalid'); busy=false; return;
   }
   moves--; combo=1;
   await processMatches(matches);
@@ -271,6 +272,7 @@ async function activateGemSwap(r1,c1,r2,c2,tA,tB){
   const cells=[...toDestroy].map(k=>({r:Math.floor(k/COLS),c:k%COLS}));
   const color=(tA?.kind==='gem-area'||tB?.kind==='gem-area')?'#ffaa0066':'#00e5ff55';
   spawnGemBurst(cells,color);
+  Snd.play('bomb'); FX.shake(320,1); { const p=FX.center(r1,c1); if(p){ FX.ring(p.x,p.y,'#ffaa40',140); FX.burst(p.x,p.y,['#ffaa40','#fff0a0','#ff6a20'],16,{max:250}); } }
   cells.forEach(({r,c})=>getCell(r,c)?.classList.add('popping'));
   await wait(340);
 
@@ -391,6 +393,10 @@ async function processMatches(matches){
       spawnGemBurst(blastCells,color);
     });
   }
+  Snd.play('match',{combo,n:sz});
+  finalRemove.forEach(({r,c})=>{ const t=board[r][c]; if(t&&!isRock(t)&&!exitKeys.has(r*COLS+c)){ const p=FX.center(r,c); if(p) FX.burst(p.x,p.y,isGem(t)?['#ffd060','#fff6d8']:(TILE_COLORS[t.t]||'#ffd060'),isGem(t)?10:5); } });
+  if(gemCreated){ Snd.play('special'); const p=FX.center(gemCreated.r,gemCreated.c); if(p) FX.ring(p.x,p.y); }
+  if(gemCells.length){ Snd.play('bomb'); FX.shake(280,0.7); }
   await wait(340);
 
   // ── Puntos: solo cuentan las fichas, no las rocas ──
@@ -403,6 +409,7 @@ async function processMatches(matches){
   // ── Score popup ──
   const pivR=matches[0]?.r??0, pivC=matches[0]?.c??0;
   spawnScorePopup(pivR, pivC, pts, TILE_COLORS[ttype]);
+  if(combo>=2){ FX.comboCall(combo); if(combo>=3) Snd.play('combo',combo); if(combo>=4) FX.cheer('big'); } else if(sz>=6){ FX.callout('¡GRAN GOLPE!','c3'); }
 
   // ── Log ──
   const bonusTxt=combo>1?` (×${combo})`:'';

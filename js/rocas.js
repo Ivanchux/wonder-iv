@@ -73,7 +73,7 @@ async function deliverBlock(fromRect, mat, delayMs, variant){
   pendingDeliveries++;
   const run=runId, dead=()=>run!==runId;
   const stageIdx=Math.min(WONDERS[level].stages-1, deliveredIdx++);
-  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce=FX.reduced();
   const feet=groundFeetY();
   const bx=fromRect.left+fromRect.width/2;            // centro del bloque
   const site=document.getElementById('site-scene');
@@ -87,7 +87,7 @@ async function deliverBlock(fromRect, mat, delayMs, variant){
   if(reduce){ blk.style.top=groundTop+'px'; }
   else await anim(blk,[{transform:'translateY(0) rotate(0deg)'},{transform:`translateY(${dy}px) rotate(14deg)`,offset:.7},{transform:`translateY(${dy-8}px) rotate(8deg)`,offset:.85},{transform:`translateY(${dy}px) rotate(10deg)`}],{duration:520,easing:'cubic-bezier(.5,0,.9,.5)'});
   if(dead()){ blk.remove(); return; }
-  spawnDust(bx,feet);
+  spawnDust(bx,feet); Snd.play('fall');
   // 2) aparece un operario a un lado y anda hasta el bloque
   const fromLeft=bx<=innerWidth/2;
   const walk=sprSize(WORKER_KINDS[variant%4]+'_walk',W_H);
@@ -104,6 +104,7 @@ async function deliverBlock(fromRect, mat, delayMs, variant){
   if(dead()){ blk.remove(); w.remove(); return; }
   // 3) se agacha, coge el bloque y se lo lleva en brazos hacia la maravilla
   const carry=carryKey(variant,mat), cz=sprSize(carry,W_H);
+  Snd.play('pickup');
   if(!reduce){ w.classList.add('paused'); await anim(w,[{transform:'scaleY(1)'},{transform:'scaleY(.9)'},{transform:'scaleY(1)'}],{duration:420,easing:'ease-in-out'}); w.getAnimations().forEach(a=>a.cancel()); w.classList.remove('paused'); }
   blk.remove();
   if(dead()){ w.remove(); return; }
@@ -114,6 +115,7 @@ async function deliverBlock(fromRect, mat, delayMs, variant){
   if(dead()){ w.remove(); return; }
   w.style.left=(dockC-cz.w/2)+'px'; w.getAnimations().forEach(a=>a.cancel());
   placeStage(stageIdx); spawnDust(dockC,feet);
+  Snd.play('place'); FX.burst(dockC,feet-34,['#fff6d8','#f2d27a'],9); if(Math.random()<0.55) FX.cheer('cheer');
   // 5) deja el bloque y se va
   const back=WORKER_KINDS[variant%4]+'_walk', bz=sprSize(back,W_H);
   w.innerHTML=sprHTML(back,W_H,0.8); w.style.width=bz.w+'px'; setC(dockC); w.classList.toggle('face-left',!goLeft);
@@ -132,7 +134,7 @@ function collectExits(exits,rects){
   exits.forEach((e,i)=>{
     const rect=rects[i]||boardBottomRect(e.c);
     matsGot[e.tile.mat]=(matsGot[e.tile.mat]||0)+e.tile.blocks;
-    rocksLeft--; wonderProg+=e.tile.blocks;
+    rocksLeft--; wonderProg+=e.tile.blocks; Snd.play('exit'); FX.burst(rect.left+rect.width/2,rect.top+rect.height/2,['#e2d2ac','#b09a6a','#fff6d8'],9,{kind:'spark',grav:520,max:170});
     for(let k=0;k<e.tile.blocks;k++){ deliverBlock(rect,e.tile.mat,d,pickWorker(e.tile.mat,e.c+k+deliveredIdx)); d+=520; }
     log(`${MATERIALS[e.tile.mat].name} +${e.tile.blocks}`,'gold');
   });

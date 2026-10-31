@@ -81,7 +81,7 @@ const FX=(function(){
   // ── Obreros: reacciones ──
   const PHRASES={ cheer:['¡Bien hecho!','¡Aúpa!','¡Otro más!','¡Qué piedra!','¡Eso es!','¡Sigue así!','¡Esa es buena!'], win:['¡Lo logramos!','¡Qué obra!','¡Mirad eso!'], lose:['Mañana será otro día…','Se acabó el jornal…'], big:['¡Menudo golpe!','¡Cuidado con eso!','¡Madre mía!'] };
   function bubble(x,y,text,cls=''){
-    const e=document.createElement('div'); e.className='bubble '+cls; e.textContent=text; e.style.left=x+'px'; e.style.top=y+'px';
+    const e=document.createElement('div'); e.className='bubble '+cls; e.textContent=text; e.style.left=Math.max(80,Math.min(innerWidth-80,x))+'px'; e.style.top=y+'px';
     document.body.appendChild(e); setTimeout(()=>e.remove(),1900);
   }
   function lane(){ return [...document.querySelectorAll('.g-lane .idle')]; }

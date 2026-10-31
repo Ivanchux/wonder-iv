@@ -22,6 +22,8 @@ function startLevel(idx){
 
   document.getElementById('overlay').classList.remove('show');
   showScreen('screen-game');
+  document.body.classList.add('in-level');
+  document.getElementById('fondo').style.backgroundImage=`url(img/fondos/fondo_${w.id}.jpg)`;
   inputBound=false;
   buildBoard();
   requestAnimationFrame(()=>{ relayoutBoard(); });

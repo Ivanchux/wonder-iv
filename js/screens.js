@@ -10,6 +10,7 @@ function showScreen(id) {
 function goToSelect() {
   document.getElementById('overlay').classList.remove('show');
   document.body.classList.remove('in-level');
+  Snd.music('menu');
   showScreen('screen-select');
 }
 

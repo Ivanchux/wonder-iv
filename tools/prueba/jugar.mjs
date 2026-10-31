@@ -24,6 +24,37 @@ ok(await page.evaluate(() => !upgradeBuilding('casa')), 'no se puede mejorar sin
 await page.evaluate(() => startLevel(0));
 ok(await page.evaluate(() => moves === WONDERS[0].movs + 2 && puCounts.bomb === PU_DEFAULTS.bomb + 1 && puCounts.ray === PU_DEFAULTS.ray + 1 && puCounts.shuffle === PU_DEFAULTS.shuffle + 1 && puCounts.color === PU_DEFAULTS.color + 1), 'las ventajas de los edificios se aplican al empezar la obra');
 
+console.log('Interfaz y sonido');
+ok(await page.evaluate(() => !document.body.innerHTML.toLowerCase().includes('retroterm')), 'no queda ninguna referencia a Retroterm en la página');
+const audio = await page.evaluate(async () => { const o = []; for (const id of Object.keys(Snd.TRACKS)) { const b = await Snd.render(id, 12); let sq = 0, n = 0, pk = 0, bad = 0; for (let c = 0; c < 2; c++) for (const v of b.getChannelData(c)) { if (!isFinite(v)) bad++; sq += v * v; n++; pk = Math.max(pk, Math.abs(v)); } o.push({ id, rms: Math.sqrt(sq / n), pk, bad }); } return o; });
+audio.forEach(t => ok(t.bad === 0 && t.rms > 0.01 && t.pk < 0.99, `pista ${t.id}: suena y no satura (rms ${t.rms.toFixed(3)}, pico ${t.pk.toFixed(2)})`));
+const sfx = await page.evaluate(async () => { const bad = []; for (const id of Object.keys(Snd.S)) { const b = await Snd.render(id, 2); let pk = 0; for (const v of b.getChannelData(0)) pk = Math.max(pk, Math.abs(v)); if (!(pk > 0.005 && pk < 0.99)) bad.push(id); } return bad; });
+ok(sfx.length === 0, 'todos los efectos de sonido suenan' + (sfx.length ? ' (fallan: ' + sfx.join(', ') + ')' : ''));
+await page.click('#btn-music');
+ok(await page.evaluate(() => Snd.cfg.music === false && JSON.parse(localStorage.getItem('wonder_audio')).music === false), 'el botón de música silencia y se guarda');
+await page.click('#btn-music'); await page.click('#btn-sfx'); await page.click('#btn-sfx');
+await page.keyboard.press('Escape');
+ok(await page.evaluate(() => document.getElementById('settings').classList.contains('show')), 'Esc abre los ajustes');
+await page.click('#set-reduce'); ok(await page.evaluate(() => document.body.classList.contains('reduce-motion')), 'reducir movimiento se activa'); await page.click('#set-reduce');
+await page.keyboard.press('Escape');
+ok(await page.evaluate(() => !document.getElementById('settings').classList.contains('show')), 'Esc cierra los ajustes');
+
+console.log('Poderes y efectos (con animaciones)');
+const page2 = await (await browser.newContext({ viewport: { width: 1200, height: 800 } })).newPage(); page2.on('pageerror', e => problems.push('error: ' + e)); page2.on('requestfailed', r => problems.push('petición fallida: ' + r.url()));
+await page2.goto(url);
+const pu = await page2.evaluate(async () => {
+  window.wait = ms => new Promise(r => setTimeout(r, Math.min(ms, 60))); startLevel(2); await new Promise(r => setTimeout(r, 400)); const out = {};
+  const idle = async () => { for (let i = 0; i < 200 && busy; i++) await new Promise(r => setTimeout(r, 40)); };
+  puCounts = { bomb: 3, ray: 3, shuffle: 3, color: 3 };
+  activatePowerup('shuffle'); await idle(); out.shuffle = !busy;
+  activatePowerup('bomb'); await applyPowerupAt(4, 3); await idle(); out.bomb = !busy;
+  activatePowerup('ray'); await applyPowerupAt(5, 3); await idle(); out.ray = !busy;
+  activatePowerup('color'); await applyPowerupAt(5, 5); await idle(); out.color = !busy;
+  for (let k = 0; k < 6; k++) { let best = null; for (let r = 0; r < ROWS && !best; r++) for (let c = 0; c < COLS && !best; c++) for (const [dr, dc] of [[0, 1], [1, 0]]) { const r2 = r + dr, c2 = c + dc; if (r2 >= ROWS || c2 >= COLS || !canSwapPair(r, c, r2, c2)) continue; swap(r, c, r2, c2); const m = findMatches(); swap(r, c, r2, c2); if (m.length) { best = { r, c, r2, c2 }; break; } } if (best) { await doSwap(best.r, best.c, best.r2, best.c2); await idle(); } }
+  out.intro = !!document.querySelector('.intro'); out.canvas = !!document.getElementById('fx-canvas'); return out; });
+Object.entries(pu).forEach(([k, v]) => ok(v, 'poder/efecto ' + k + ' sin atascos'));
+await page2.close();
+
 console.log('Partidas con bot (movimientos ilimitados)');
 const BOT = async runs => page.evaluate(async ([runs]) => {
   window.wait = ms => new Promise(r => setTimeout(r, Math.min(ms, 20))); const out = [];

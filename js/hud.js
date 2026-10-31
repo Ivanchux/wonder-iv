@@ -32,7 +32,7 @@ function updateUI(){
   movEl.textContent=mv;
   const max=WONDERS[level].movs, f=document.getElementById('meter-fill');
   if(f){ f.style.height=Math.round(100*mv/max)+'%'; f.style.setProperty('--mw',Math.round(100*mv/max)+'%'); }
-  if(mv<=5&&mv>0){ movEl.classList.add('low'); movBox.classList.add('warn-box'); }
+  if(mv<=5&&mv>0){ movEl.classList.add('low'); movBox.classList.add('warn-box'); if(updateUI._lm!==mv){ updateUI._lm=mv; Snd.play('tick'); } }
   else { movEl.classList.remove('low'); movBox.classList.remove('warn-box'); }
   document.getElementById('combo').textContent=`×${combo}`;
   document.getElementById('badge-lvl').textContent=`NIVEL ${String(level+1).padStart(2,'0')}`;
@@ -71,19 +71,22 @@ async function showWin(){
   document.getElementById('ov-sub').textContent=`${w.name} — CONSTRUIDA`;
   document.getElementById('ov-scene').innerHTML=wonderSceneSVG(w.id,w.stages);
   const got=Object.entries(matsGot); got.forEach(([m,n])=>addStock(m,n));
-  document.getElementById('ov-mats').textContent=got.map(([m,n])=>`${MATERIALS[m].name} +${n}`).join('  ·  ');
+  document.getElementById('ov-mats').innerHTML=got.map(([m,n])=>`<span class="mchip"><img src="img/bloques/bloque_${m}.png" alt=""><b>+${n}</b><i>${MATERIALS[m].name}</i></span>`).join('');
+  { const st=getStock(), can=BUILDINGS.filter(b=>{ const lv=buildingLevel(b.id); return lv<BUILD_MAX&&(st[b.mat]||0)>=b.cost[lv]; }); document.getElementById('ov-tip').textContent=can.length?'Puedes mejorar en el asentamiento: '+can.map(b=>b.name.toLowerCase()).join(', '):''; }
   document.getElementById('ov-score').textContent=`${score} PTS`;
   document.getElementById('btn-next').style.display=(level+1<WONDERS.length)?'':'none';
 
   // Reset stars
   ['ov-s1','ov-s2','ov-s3'].forEach(id=>document.getElementById(id).classList.remove('lit'));
   document.getElementById('overlay').classList.add('show');
+  document.querySelectorAll('.toast,.intro,.callout').forEach(e=>e.remove());
+  Snd.play('win'); Snd.duck(3.5); FX.confetti(); FX.cheer('win',true);
 
   // Animate stars with delay
   await wait(600);
   for(let i=0;i<stars;i++){
     await wait(320);
-    document.getElementById(['ov-s1','ov-s2','ov-s3'][i]).classList.add('lit');
+    document.getElementById(['ov-s1','ov-s2','ov-s3'][i]).classList.add('lit'); Snd.play('star',i);
   }
   buildSelectScreen(); // refresh best scores
 }
@@ -94,11 +97,13 @@ function showLose(){
   document.getElementById('ov-title').textContent='OBRA PARADA';
   document.getElementById('ov-sub').textContent='SE ACABARON LOS MOVIMIENTOS';
   document.getElementById('ov-scene').innerHTML='';
+  document.getElementById('ov-tip').textContent='';
   document.getElementById('ov-mats').textContent=kept.length?'Te llevas la mitad: '+kept.map(([m,n])=>`${MATERIALS[m].name} +${n}`).join('  ·  '):'';
   document.getElementById('ov-score').textContent=`${score} PTS`;
   document.getElementById('btn-next').style.display='none';
   ['ov-s1','ov-s2','ov-s3'].forEach(id=>document.getElementById(id).classList.remove('lit'));
   document.getElementById('overlay').classList.add('show');
+  Snd.play('lose'); Snd.duck(2.5); FX.cheer('lose');
 }
 
 // ════════════════════════════════════════

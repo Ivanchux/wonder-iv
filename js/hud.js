@@ -30,30 +30,18 @@ function updateUI(){
   const movBox=document.getElementById('stat-moves-box');
   const mv=Math.max(0,moves);
   movEl.textContent=mv;
+  const max=WONDERS[level].movs, f=document.getElementById('meter-fill');
+  if(f){ f.style.height=Math.round(100*mv/max)+'%'; f.style.setProperty('--mw',Math.round(100*mv/max)+'%'); }
   if(mv<=5&&mv>0){ movEl.classList.add('low'); movBox.classList.add('warn-box'); }
   else { movEl.classList.remove('low'); movBox.classList.remove('warn-box'); }
   document.getElementById('combo').textContent=`×${combo}`;
-  document.getElementById('badge-lvl').textContent=`LVL ${String(level+1).padStart(2,'0')}`;
+  document.getElementById('badge-lvl').textContent=`NIVEL ${String(level+1).padStart(2,'0')}`;
   if(combo>1) bumpStat('combo');
 }
 function updateWonder(){
   const w=WONDERS[level];
   document.getElementById('wonder-name').textContent=w.name;
-  document.getElementById('wonder-desc').textContent=w.desc;
-  const eraName=w.eras[currentEra]?.name||`ERA ${currentEra+1}`;
-  document.getElementById('era-label-text').textContent=eraName;
   document.getElementById('prog-text').textContent=`${wonderProg} / ${w.stages}`;
-  const track=document.getElementById('prog-track');
-  track.innerHTML='';
-  for(let i=0;i<w.stages;i++){
-    const s=document.createElement('div');
-    const isLit=i<wonderProg, isNew=i>=prevProgSegs&&i<wonderProg;
-    // Color segment by era
-    const eraColor= i<eraThresholds[0] ? '#ffaa00' : i<eraThresholds[1] ? '#cc44ff' : '#00e5ff';
-    s.className='prog-seg'+(isLit?' lit':'')+(isNew?' lit-new':'');
-    if(isLit) s.style.background=eraColor, s.style.boxShadow=`0 0 6px ${eraColor}`, s.style.borderColor=eraColor;
-    track.appendChild(s);
-  }
 }
 
 // ════════════════════════════════════════
@@ -80,8 +68,10 @@ async function showWin(){
   if(stars>prevStars) setBestStars(level, stars);
 
   document.getElementById('ov-title').textContent='COMPLETO';
-  document.getElementById('ov-sub').textContent=`${w.name} — RECONSTRUIDA`;
-  document.getElementById('ov-ascii').textContent=w.ascii.join('\n');
+  document.getElementById('ov-sub').textContent=`${w.name} — CONSTRUIDA`;
+  document.getElementById('ov-scene').innerHTML=wonderSceneSVG(w.id,w.stages);
+  const got=Object.entries(matsGot); got.forEach(([m,n])=>addStock(m,n));
+  document.getElementById('ov-mats').textContent=got.map(([m,n])=>`${MATERIALS[m].name} +${n}`).join('  ·  ');
   document.getElementById('ov-score').textContent=`${score} PTS`;
   document.getElementById('btn-next').style.display=(level+1<WONDERS.length)?'':'none';
 
@@ -99,9 +89,12 @@ async function showWin(){
 }
 
 function showLose(){
-  document.getElementById('ov-title').textContent='EXPEDICIÓN FALLIDA';
-  document.getElementById('ov-sub').textContent='MOVIMIENTOS AGOTADOS — REINICIO REQUERIDO';
-  document.getElementById('ov-ascii').textContent='';
+  const kept=Object.entries(matsGot).map(([m,n])=>[m,Math.floor(n/2)]).filter(([,n])=>n>0);
+  kept.forEach(([m,n])=>addStock(m,n));
+  document.getElementById('ov-title').textContent='OBRA PARADA';
+  document.getElementById('ov-sub').textContent='SE ACABARON LOS MOVIMIENTOS';
+  document.getElementById('ov-scene').innerHTML='';
+  document.getElementById('ov-mats').textContent=kept.length?'Te llevas la mitad: '+kept.map(([m,n])=>`${MATERIALS[m].name} +${n}`).join('  ·  '):'';
   document.getElementById('ov-score').textContent=`${score} PTS`;
   document.getElementById('btn-next').style.display='none';
   ['ov-s1','ov-s2','ov-s3'].forEach(id=>document.getElementById(id).classList.remove('lit'));

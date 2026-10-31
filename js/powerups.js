@@ -20,13 +20,9 @@ function useShuffle(){
   if(puCounts.shuffle<=0||busy) return;
   busy=true;
   puCounts.shuffle--;
-  const all=[];
-  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) all.push(board[r][c]);
-  for(let i=all.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [all[i],all[j]]=[all[j],all[i]]; }
-  let k=0;
-  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){ board[r][c]=all[k++]; syncCell(r,c); }
+  shuffleBoard();
   updatePowerups();
-  log('⟳ Tablero revuelto.','warn');
+  log('Tablero revuelto.','warn');
   busy=false;
 }
 
@@ -40,53 +36,57 @@ async function applyPowerupAt(r, c){
 
   if(type==='bomb'){
     // 3×3 area bomb
-    const cells=[];
+    const setB=new Set();
     for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++){
       const nr=r+dr, nc=c+dc;
-      if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS) cells.push({r:nr,c:nc});
+      if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS) setB.add(nr*COLS+nc);
     }
+    for(const k of [...setB]){ if(isRock(board[Math.floor(k/COLS)][k%COLS])) setB.delete(k); }
+    const cells=[...setB].map(k=>({r:Math.floor(k/COLS),c:k%COLS}));
     spawnGemBurst(cells,'#ffaa0044');
-    log(`💥 BOMBA — ${cells.length} fichas destruidas.`,'warn');
+    log(`BOMBA — ${cells.length} piezas.`,'warn');
     await wait(300);
-    const pts=cells.length*80;
+    const pts=cells.filter(({r,c})=>!isRock(board[r][c])).length*80;
     score+=pts;
     cells.forEach(({r,c})=>{ board[r][c]=null; cellDom[r][c]?.remove(); cellDom[r][c]=null; });
     spawnScorePopup(r,c,pts,'#ffaa00');
     bumpStat('score'); updateUI();
     await wait(100);
-    dropTiles(); fillBoard(); renderBoard();
+    const exP=dropTiles(); fillBoard(); renderBoard(); if(exP.length) collectExits(exP,[]);
     await wait(200);
     const m2=findMatches();
-    if(m2.length){ await processMatches(m2); } else { busy=false; }
+    if(m2.length){ await processMatches(m2); } else { await afterPower(); }
 
   } else if(type==='ray'){
     // Destroy entire row
-    const cells=[];
-    for(let cc=0;cc<COLS;cc++) cells.push({r,c:cc});
+    const setR=new Set();
+    for(let cc=0;cc<COLS;cc++) setR.add(r*COLS+cc);
+    for(const k of [...setR]){ if(isRock(board[Math.floor(k/COLS)][k%COLS])) setR.delete(k); }
+    const cells=[...setR].map(k=>({r:Math.floor(k/COLS),c:k%COLS}));
     spawnGemBurst(cells,'#00e5ff44');
-    log(`⚡ RAYO — fila ${r+1} destruida.`,'info');
+    log(`RAYO — fila ${r+1}.`,'info');
     await wait(300);
-    const pts2=cells.length*80;
+    const pts2=cells.filter(({r,c})=>!isRock(board[r][c])).length*80;
     score+=pts2;
     cells.forEach(({r,c})=>{ board[r][c]=null; cellDom[r][c]?.remove(); cellDom[r][c]=null; });
     spawnScorePopup(r,Math.floor(COLS/2),pts2,'#00e5ff');
     bumpStat('score'); updateUI();
     await wait(100);
-    dropTiles(); fillBoard(); renderBoard();
+    const exP=dropTiles(); fillBoard(); renderBoard(); if(exP.length) collectExits(exP,[]);
     await wait(200);
     const m3=findMatches();
-    if(m3.length){ await processMatches(m3); } else { busy=false; }
+    if(m3.length){ await processMatches(m3); } else { await afterPower(); }
 
   } else if(type==='color'){
     // Destroy all tiles of the tapped color
     const ttype=board[r][c]?.t;
-    if(ttype==null){ busy=false; return; }
+    if(ttype==null||ttype<0||isRock(board[r][c])){ busy=false; puCounts.color++; updatePowerups(); return; }
     const cells2=[];
     for(let rr=0;rr<ROWS;rr++) for(let cc=0;cc<COLS;cc++){
       if(board[rr][cc]?.t===ttype) cells2.push({r:rr,c:cc});
     }
     spawnGemBurst(cells2, TILE_COLORS[ttype]+'44');
-    log(`✨ AURORA — ${cells2.length}× ${TILE_NAMES[ttype]} eliminados.`,'rune');
+    log(`AURORA — ${cells2.length}× ${TILE_NAMES[ttype]}.`,'rune');
     await wait(300);
     const pts3=cells2.length*100;
     score+=pts3;
@@ -94,10 +94,10 @@ async function applyPowerupAt(r, c){
     spawnScorePopup(r,c,pts3,TILE_COLORS[ttype]);
     bumpStat('score'); updateUI();
     await wait(100);
-    dropTiles(); fillBoard(); renderBoard();
+    const exP=dropTiles(); fillBoard(); renderBoard(); if(exP.length) collectExits(exP,[]);
     await wait(200);
     const m4=findMatches();
-    if(m4.length){ await processMatches(m4); } else { busy=false; }
+    if(m4.length){ await processMatches(m4); } else { await afterPower(); }
   }
 }
 
@@ -112,30 +112,9 @@ function updatePowerups(){
   });
 }
 
-function updateObjectives(){
-  const w=WONDERS[level];
-  const era=w.eras[currentEra];
-  const list=document.getElementById('obj-list');
-  if(!list) return;
-  list.innerHTML='';
-
-  // Main objective: collect N tiles of type
-  const needed=era.objCount;
-  const done=objCollected>=needed;
-  const item=document.createElement('div');
-  item.className='obj-item'+(done?' done':'');
-  item.innerHTML=
-    `<span class="obj-glyph" style="color:${TILE_COLORS[era.objType]};display:inline-flex;align-items:center;width:20px;height:20px;">${gemSVG(era.objType)}</span>`+
-    `<span class="obj-val">${TILE_NAMES[era.objType]}</span>`+
-    `<span class="obj-needed">${Math.min(objCollected,needed)} / ${needed}</span>`;
-  list.appendChild(item);
-
-  // Bonus objective: current era multiplier
-  const bonusItem=document.createElement('div');
-  bonusItem.className='obj-item';
-  bonusItem.innerHTML=
-    `<span class="obj-glyph">⚡</span>`+
-    `<span class="obj-val">${era.bonus}</span>`+
-    `<span class="obj-needed">ACTIVO</span>`;
-  list.appendChild(bonusItem);
+// Tras un poder: ¿se terminó la obra? ¿faltan movimientos? ¿hay jugadas?
+async function afterPower(){
+  if(rocksLeft<=0){ const run=runId; await waitDeliveries(); await wait(300); if(run===runId) showWin(); return; }
+  if(!hasMoves()){ log('Sin movimientos. Revolviendo.','warn'); shuffleBoard(); }
+  busy=false;
 }

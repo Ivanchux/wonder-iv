@@ -11,72 +11,33 @@ function isGem(tile){ return tile?.kind==='gem-line'||tile?.kind==='gem-area'; }
 //  START LEVEL
 // ════════════════════════════════════════
 function startLevel(idx){
+  runId++;
   level=idx; score=0; moves=WONDERS[level].movs;
   combo=1; wonderProg=0; prevProgSegs=0;
   selected=null; busy=false; hintPair=[];
   activePu=null;
   puCounts={...PU_DEFAULTS};
-
-  // Eras init
-  currentEra=0;
+  // ventajas del asentamiento
+  BUILDINGS.forEach(b=>{ const lv=buildingLevel(b.id); if(!lv) return; if(b.pu) puCounts[b.pu]+=lv; else moves+=2*lv; });
+  rocksLeft=WONDERS[level].rocks.length; pendingDeliveries=0; deliveredIdx=0; matsGot={}; siteBuilt=0;
+  const fl=document.getElementById('fx-layer'); if(fl) fl.innerHTML='';
   const w=WONDERS[level];
-  eraThresholds=[Math.floor(w.stages/3), Math.floor(w.stages*2/3)];
-  objCollected=0;
-  scoreBonus=w.eras[0].scoreBonus;
 
   document.getElementById('overlay').classList.remove('show');
-  document.getElementById('era-card').classList.remove('show');
   showScreen('screen-game');
+  document.body.classList.add('in-level');
+  document.getElementById('fondo').style.backgroundImage=`url(img/fondos/fondo_${w.id}.jpg)`;
   inputBound=false;
   buildBoard();
-  requestAnimationFrame(()=>{ drawSceneBg(); relayoutBoard(); });
-  initAscii(); updateUI(); updateWonder(); updatePowerups(); updateObjectives();
-  log('Expedición iniciada.','dim');
-  log(`Objetivo: ${w.name}`, 'info');
-  log(`${w.eras[0].name} — activa`, 'gold');
+  requestAnimationFrame(()=>{ relayoutBoard(); });
+  preloadSprites(); renderSite(); fillLane(); updateUI(); updateWonder(); updatePowerups();
+  log('Obra iniciada.','dim');
+  { const extra=BUILDINGS.filter(b=>buildingLevel(b.id)).map(b=>b.name.split(' ')[0]).join(', '); if(extra) log('Tu asentamiento ayuda: '+extra.toLowerCase()+'.','info'); }
+  log(`${w.name}: rompe las rocas para conseguir ${MATERIALS[w.mat].name}.`, 'info');
 }
 
 function restartLevel(){ startLevel(level); }
 function nextLevel(){ if(level+1<WONDERS.length) startLevel(level+1); else goToSelect(); }
-
-// ════════════════════════════════════════
-//  ERA SYSTEM
-// ════════════════════════════════════════
-function checkEraAdvance(){
-  const w=WONDERS[level];
-  const newEra = wonderProg >= eraThresholds[1] ? 2 : wonderProg >= eraThresholds[0] ? 1 : 0;
-  if(newEra > currentEra){
-    currentEra=newEra;
-    objCollected=0;
-    scoreBonus=w.eras[currentEra].scoreBonus;
-    showEraCard(currentEra);
-  }
-}
-
-let _eraDismissTimer=null;
-function showEraCard(eraIdx){
-  const w=WONDERS[level];
-  const era=w.eras[eraIdx];
-  document.getElementById('era-title').textContent=era.name;
-  document.getElementById('era-desc').textContent=era.desc;
-  document.getElementById('era-bonus-val').textContent=era.bonus;
-  // No bloquea el juego — toast pasivo
-  const card=document.getElementById('era-card');
-  card.classList.remove('dismiss');
-  card.classList.add('show');
-  if(_eraDismissTimer) clearTimeout(_eraDismissTimer);
-  _eraDismissTimer=setTimeout(()=>dismissEraCard(), 4200);
-}
-
-function dismissEraCard(){
-  if(_eraDismissTimer){ clearTimeout(_eraDismissTimer); _eraDismissTimer=null; }
-  const card=document.getElementById('era-card');
-  card.classList.add('dismiss');
-  setTimeout(()=>{ card.classList.remove('show','dismiss'); },320);
-  updateObjectives();
-  log(`${WONDERS[level].eras[currentEra].name} — activa`,'gold');
-}
-
 
 // ════════════════════════════════════════
 //  BOARD
@@ -107,9 +68,11 @@ function tileClass(tile){
   if(tile.kind==='gem-line') cls+=' gem-line';
   else if(tile.kind==='gem-area') cls+=' gem-area';
   else if(tile.kind==='rune') cls+=' rune';
+  else if(tile.kind==='rock') return `cell rock rock-${tile.mat}`;
   return cls;
 }
 function tileHTML(tile){
+  if(tile.kind==='rock') return rockSVG(tile.mat,tile.blocks);
   if(tile.kind==='gem-line') return gemLineSVG();
   if(tile.kind==='gem-area') return gemAreaSVG();
   if(tile.kind==='rune'){
@@ -156,9 +119,18 @@ function relayoutBoard(){
 }
 
 function buildBoard(){
-  board=[];
-  for(let r=0;r<ROWS;r++){ board[r]=[]; for(let c=0;c<COLS;c++) board[r][c]=mkTile(); }
-  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) while(hasMatchAt(r,c)) board[r][c]=mkTile();
+  const w=WONDERS[level];
+  for(let tries=0;tries<50;tries++){
+    board=[];
+    for(let r=0;r<ROWS;r++){ board[r]=[]; for(let c=0;c<COLS;c++) board[r][c]=mkTile(); }
+    placeRocks(w);
+    // sin combinaciones hechas al empezar
+    for(let guard=0;guard<200;guard++){
+      const m=findMatches(); if(!m.length) break;
+      m.forEach(({r,c})=>{ board[r][c]=mkTile(); });
+    }
+    if(!findMatches().length&&hasMoves()) break;
+  }
   renderBoard();
 }
 
@@ -202,6 +174,7 @@ function bindInputHandlers(){
 
 function handleTap(r,c){
   clearHints();
+  if(isRock(board[r][c])){ clearSel(); rockNudge(r,c); return; }
   if(selected===null){ selected={r,c}; getCell(r,c)?.classList.add('selected'); return; }
   if(selected.r===r&&selected.c===c){ clearSel(); return; }
   const dr=Math.abs(selected.r-r), dc=Math.abs(selected.c-c);
@@ -210,12 +183,14 @@ function handleTap(r,c){
   if((dr===1&&dc===0)||(dr===0&&dc===1)) doSwap(pr,pc2,r,c);
   else { selected={r,c}; getCell(r,c)?.classList.add('selected'); }
 }
+function rockNudge(r,c){ const el=getCell(r,c); if(!el) return; el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'),400); }
 function clearSel(){ if(selected){ getCell(selected.r,selected.c)?.classList.remove('selected'); selected=null; } }
 
 // ════════════════════════════════════════
 //  SWAP
 // ════════════════════════════════════════
 async function doSwap(r1,c1,r2,c2){
+  if(isRock(board[r1][c1])||isRock(board[r2][c2])){ rockNudge(isRock(board[r1][c1])?r1:r2,isRock(board[r1][c1])?c1:c2); return; }
   busy=true;
   const el1=getCell(r1,c1), el2=getCell(r2,c2);
   const SWAP_MS=140;
@@ -246,11 +221,6 @@ async function doSwap(r1,c1,r2,c2){
     log('Sin combinacion.','err'); busy=false; return;
   }
   moves--; combo=1;
-  const mid=getCell(r1,c1);
-  if(mid){
-    const br=mid.getBoundingClientRect(), bw=document.getElementById('board-wrap').getBoundingClientRect();
-    spawnPulse(br.left-bw.left+br.width/2, br.top-bw.top+br.height/2);
-  }
   await processMatches(matches);
 }
 
@@ -297,27 +267,30 @@ async function activateGemSwap(r1,c1,r2,c2,tA,tB){
     }
   }
 
+  for(const k of [...toDestroy]){ if(isRock(board[Math.floor(k/COLS)][k%COLS])) toDestroy.delete(k); }   // los bloques no se destruyen
   const cells=[...toDestroy].map(k=>({r:Math.floor(k/COLS),c:k%COLS}));
   const color=(tA?.kind==='gem-area'||tB?.kind==='gem-area')?'#ffaa0066':'#00e5ff55';
   spawnGemBurst(cells,color);
   cells.forEach(({r,c})=>getCell(r,c)?.classList.add('popping'));
   await wait(340);
 
-  const pts=Math.round(cells.length*120*combo*scoreBonus);
+  const pts=Math.round(cells.filter(({r,c})=>!isRock(board[r][c])).length*120*combo*scoreBonus);
   score+=pts; bumpStat('score');
   spawnScorePopup(r1,c1,pts,'#ffd060');
   updateUI();
 
   cells.forEach(({r,c})=>{ cellDom[r][c]?.remove(); cellDom[r][c]=null; board[r][c]=null; });
-  dropTiles(); fillBoard(); renderBoard();
+  const exG=dropTiles(); fillBoard(); renderBoard();
+  if(exG.length) collectExits(exG,[]);
   await wait(260);
-  combo++; updateUI(); updateWonder(); checkEraAdvance();
+  combo++; updateUI(); updateWonder();
   const chain=findMatches();
   if(chain.length){ await wait(80); await processMatches(chain); }
   else {
     combo=1; updateUI();
-    if(wonderProg>=WONDERS[level].stages){ await wait(400); showWin(); return; }
-    if(moves<=0){ await wait(400); showLose(); return; }
+    { const run=runId;
+      if(rocksLeft<=0){ await waitDeliveries(); await wait(300); if(run===runId) showWin(); return; }
+      if(moves<=0){ await wait(400); if(run===runId) showLose(); return; } }
     if(!hasMoves()){ log('Sin movimientos. Revolviendo.','warn'); shuffleBoard(); }
     busy=false;
   }
@@ -332,10 +305,10 @@ function findMatches(){
     let c=0;
     while(c<COLS){
       const tile=board[r][c];
-      if(!tile||isGem(tile)){c++;continue;}
+      if(!tile||isGem(tile)||isRock(tile)){c++;continue;}
       const t=tile.t;
       let end=c+1;
-      while(end<COLS&&board[r][end]?.t===t&&!isGem(board[r][end])) end++;
+      while(end<COLS&&board[r][end]?.t===t&&!isGem(board[r][end])&&!isRock(board[r][end])) end++;
       if(end-c>=3) for(let i=c;i<end;i++) hits.add(r*COLS+i);
       c=end;
     }
@@ -344,10 +317,10 @@ function findMatches(){
     let r=0;
     while(r<ROWS){
       const tile=board[r][c];
-      if(!tile||isGem(tile)){r++;continue;}
+      if(!tile||isGem(tile)||isRock(tile)){r++;continue;}
       const t=tile.t;
       let end=r+1;
-      while(end<ROWS&&board[end][c]?.t===t&&!isGem(board[end][c])) end++;
+      while(end<ROWS&&board[end][c]?.t===t&&!isGem(board[end][c])&&!isRock(board[end][c])) end++;
       if(end-r>=3) for(let i=r;i<end;i++) hits.add(i*COLS+c);
       r=end;
     }
@@ -401,8 +374,11 @@ async function processMatches(matches){
     toRemove.delete(pivot.r*COLS+pivot.c);
   }
 
+  for(const k of [...toRemove]){ if(isRock(board[Math.floor(k/COLS)][k%COLS])) toRemove.delete(k); }   // los bloques solo salen cayendo
+  const exits=markExits(toRemove);
+  const exitKeys=new Set(exits.map(e=>e.r*COLS+e.c));
   const finalRemove=[...toRemove].map(k=>({r:Math.floor(k/COLS),c:k%COLS}));
-  finalRemove.forEach(({r,c})=>getCell(r,c)?.classList.add('popping'));
+  finalRemove.forEach(({r,c})=>{ if(!exitKeys.has(r*COLS+c)) getCell(r,c)?.classList.add('popping'); });
   if(gemCreated){
     const piv=getCell(gemCreated.r,gemCreated.c);
     if(piv){ piv.style.filter='brightness(3)'; setTimeout(()=>{piv.style.filter='';},350); }
@@ -417,26 +393,19 @@ async function processMatches(matches){
   }
   await wait(340);
 
-  // ── SCORE con bonus de era ──
-  const basePts=finalRemove.length*100*combo;
+  // ── Puntos: solo cuentan las fichas, no las rocas ──
+  const gemCount=finalRemove.filter(({r,c})=>!isRock(board[r][c])).length;
+  const basePts=gemCount*100*combo;
   const pts=Math.round(basePts*scoreBonus);
   score+=pts;
   bumpStat('score');
-
-  // ── Objetivos: contar fichas del tipo requerido ──
-  const era=WONDERS[level].eras[currentEra];
-  const matchedObj=finalRemove.filter(({r,c})=>board[r][c]?.t===era.objType).length;
-  if(matchedObj>0){
-    objCollected+=matchedObj;
-    updateObjectives();
-  }
 
   // ── Score popup ──
   const pivR=matches[0]?.r??0, pivC=matches[0]?.c??0;
   spawnScorePopup(pivR, pivC, pts, TILE_COLORS[ttype]);
 
   // ── Log ──
-  const bonusTxt=scoreBonus>1?` (×${scoreBonus})`:'';
+  const bonusTxt=combo>1?` (×${combo})`:'';
   if(gemCells.length>0){
     const gemType=gemCells[0]&&board[gemCells[0].r]?.[gemCells[0].c]?.kind;
     log(`⚡ ${gemType==='gem-area'?'ÁREA':'LÍNEA'} — ${finalRemove.length}× +${pts}${bonusTxt}`,'rune');
@@ -449,14 +418,8 @@ async function processMatches(matches){
     log(`${tname} ×${sz} — +${pts}${bonusTxt}`,'ok');
   }
 
-  // ── Wonder progress ──
-  const gained=Math.max(1,Math.floor(finalRemove.length/3));
-  const maxStages=WONDERS[level].stages;
-  prevProgSegs=wonderProg;
-  wonderProg=Math.min(maxStages, wonderProg+gained);
-  const linesPerStage=WONDERS[level].ascii.length/maxStages;
-  const targetLines=Math.ceil(wonderProg*linesPerStage);
-  while(asciiRevealed<targetLines&&asciiRevealed<WONDERS[level].ascii.length) revealAsciiLine();
+  // ── Los bloques que salen del tablero caen al suelo y los operarios se los llevan ──
+  collectExits(exits, exits.map(e=>cellDom[e.r][e.c]?.getBoundingClientRect()));
 
   // ── Place new gem — after DOM removal so it gets a fresh element ──
   if(gemCreated){
@@ -540,14 +503,14 @@ async function processMatches(matches){
 
   await wait(DROP_MS+60);
   combo++; updateUI(); updateWonder();
-  checkEraAdvance();
 
   const chain=findMatches();
   if(chain.length){ await wait(80); await processMatches(chain); }
   else {
     combo=1; updateUI();
-    if(wonderProg>=maxStages){ await wait(400); showWin(); return; }
-    if(moves<=0){ await wait(400); showLose(); return; }
+    { const run=runId;
+      if(rocksLeft<=0){ await waitDeliveries(); await wait(300); if(run===runId) showWin(); return; }
+      if(moves<=0){ await wait(400); if(run===runId) showLose(); return; } }
     if(!hasMoves()){ log('Sin movimientos. Revolviendo.','warn'); shuffleBoard(); }
     busy=false;
   }
@@ -557,11 +520,19 @@ async function processMatches(matches){
 //  BOARD HELPERS
 // ════════════════════════════════════════
 function dropTiles(){
+  const exits=[];
   for(let c=0;c<COLS;c++){
-    let empty=ROWS-1;
-    for(let r=ROWS-1;r>=0;r--){ if(board[r][c]){board[empty][c]=board[r][c]; if(empty!==r)board[r][c]=null; empty--;} }
-    for(let r=empty;r>=0;r--) board[r][c]=null;
+    for(let guard=0;guard<ROWS;guard++){
+      let empty=ROWS-1;
+      for(let r=ROWS-1;r>=0;r--){ if(board[r][c]){board[empty][c]=board[r][c]; if(empty!==r)board[r][c]=null; empty--;} }
+      for(let r=empty;r>=0;r--) board[r][c]=null;
+      // un bloque que llega a las dos filas de abajo sale del tablero
+      let out=false;
+      for(let r=ROWS-1;r>=ROCK_EXIT_ROW;r--){ const t=board[r][c]; if(isRock(t)){ exits.push({r,c,tile:t}); board[r][c]=null; out=true; } }
+      if(!out) break;
+    }
   }
+  return exits;
 }
 function fillBoard(){
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(!board[r][c]) board[r][c]=mkTile();
@@ -569,25 +540,34 @@ function fillBoard(){
 function hasMatchAt(r,c){
   const tile=board[r][c];
   if(!tile||tile.t===undefined||tile.t===null) return false;
-  if(isGem(tile)) return false;
+  if(isGem(tile)||isRock(tile)) return false;
   const t=tile.t;
   if(c>=2&&board[r][c-1]?.t===t&&!isGem(board[r][c-1])&&board[r][c-2]?.t===t&&!isGem(board[r][c-2])) return true;
   if(r>=2&&board[r-1]?.[c]?.t===t&&!isGem(board[r-1]?.[c])&&board[r-2]?.[c]?.t===t&&!isGem(board[r-2]?.[c])) return true;
   return false;
 }
+function canSwapPair(r1,c1,r2,c2){ return !isRock(board[r1][c1])&&!isRock(board[r2][c2]); }
 function hasMoves(){
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
-    if(c<COLS-1){swap(r,c,r,c+1); if(findMatches().length){swap(r,c,r,c+1);return true;} swap(r,c,r,c+1);}
-    if(r<ROWS-1){swap(r,c,r+1,c); if(findMatches().length){swap(r,c,r+1,c);return true;} swap(r,c,r+1,c);}
+    if(c<COLS-1&&canSwapPair(r,c,r,c+1)){swap(r,c,r,c+1); if(findMatches().length){swap(r,c,r,c+1);return true;} swap(r,c,r,c+1);}
+    if(r<ROWS-1&&canSwapPair(r,c,r+1,c)){swap(r,c,r+1,c); if(findMatches().length){swap(r,c,r+1,c);return true;} swap(r,c,r+1,c);}
   }
+  // una gema de línea o de área siempre se puede usar
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(isGem(board[r][c])) return true;
   return false;
 }
 function swap(r1,c1,r2,c2){ const t=board[r1][c1]; board[r1][c1]=board[r2][c2]; board[r2][c2]=t; }
 
 function shuffleBoard(){
-  const all=[]; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) all.push(board[r][c]);
-  for(let i=all.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [all[i],all[j]]=[all[j],all[i]]; }
-  let k=0; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){ board[r][c]=all[k++]; syncCell(r,c); }
+  // Las rocas se quedan donde están; se barajan las demás fichas, evitando dejar combinaciones hechas
+  const cells=[]; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(!isRock(board[r][c])) cells.push([r,c]);
+  for(let tries=0;tries<60;tries++){
+    const all=cells.map(([r,c])=>board[r][c]);
+    for(let i=all.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [all[i],all[j]]=[all[j],all[i]]; }
+    cells.forEach(([r,c],k)=>{ board[r][c]=all[k]; });
+    if(!findMatches().length&&hasMoves()) break;
+  }
+  cells.forEach(([r,c])=>syncCell(r,c));
 }
 
 // ════════════════════════════════════════
@@ -596,10 +576,21 @@ function shuffleBoard(){
 function doHint(){
   if(busy) return;
   clearHints();
+  // entre las jugadas posibles, la que despeja más celdas bajo un bloque
+  let best=null;
+  const probe=(r,c,r2,c2)=>{
+    if(!canSwapPair(r,c,r2,c2)) return;
+    swap(r,c,r2,c2); const m=findMatches(); swap(r,c,r2,c2);
+    if(!m.length) return;
+    let score=m.length*0.1;
+    for(const {r:mr,c:mc} of m){ for(let rr=0;rr<mr;rr++) if(isRock(board[rr][mc])){ score+=1; break; } }
+    if(!best||score>best.score) best={score,pair:[`${r},${c}`,`${r2},${c2}`]};
+  };
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
-    if(c<COLS-1){swap(r,c,r,c+1);if(findMatches().length){swap(r,c,r,c+1);hintPair=[`${r},${c}`,`${r},${c+1}`];applyHints();log('Movimiento sugerido.','info');return;}swap(r,c,r,c+1);}
-    if(r<ROWS-1){swap(r,c,r+1,c);if(findMatches().length){swap(r,c,r+1,c);hintPair=[`${r},${c}`,`${r+1},${c}`];applyHints();log('Movimiento sugerido.','info');return;}swap(r,c,r+1,c);}
+    if(c<COLS-1) probe(r,c,r,c+1);
+    if(r<ROWS-1) probe(r,c,r+1,c);
   }
+  if(best){ hintPair=best.pair; applyHints(); log('Movimiento sugerido.','info'); return; }
   log('No hay movimientos válidos.','err');
 }
 function applyHints(){ hintPair.forEach(k=>{const[r,c]=k.split(',');getCell(+r,+c)?.classList.add('hint-cell');}); }
